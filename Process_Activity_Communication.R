@@ -3,54 +3,11 @@
 # Plotting variability explained between each variable
 ######################################################
 
-library("ggplot2")
 library("Hmisc")
 library("reshape2")
 library("dplyr")
 library("readr")
 library("chron")
-
-####################
-# Define Functions
-####################
-
-GetR2 <- function(var1, var2) {
-  # Generates a simple linear regression model of var1~var2, and returns
-  # R-squared for that model to represent proportion of V1 explained by V2
-  # :param: var1 - Variable to 'be explained' by var2
-  # :param: var2 - Variable to 'explain' var1
-  Var1name <- colnames(var1)[1]
-  Var2name <-  colnames(var2)[1]
-  model <- lm(as.numeric(var1) ~ as.numeric(var2))
-
-  return(c(Var1name, Var2name, (summary(model)$r.squared)))
-}
-
-PlotR2s <- function(dataframe, title) {
-  # Generates geom_tile plot of the % variability explained (R2) for each variable by each other variable
-  # :param: dataframe - Dataframe to plot (each variable in the dataframe will be compared to each other
-  # :param: title - title to display on plot 
-  #  dataframe, so these must be numeric)
-  r2Matrix <- c()
-  for (a in colnames(dataframe)) {
-    for (b in colnames(dataframe)) {
-      r2Matrix <-
-        rbind(r2Matrix, (GetR2(
-          as.matrix(dataframe[a]), as.matrix(dataframe[b])
-        )))
-    }
-  }
-  PlotMatrix <- data.frame(r2Matrix)
-  colnames(PlotMatrix) <- c("factor.1", "factor.2", "variability.explained")
-  PlotMatrix$variability.explained <- as.numeric(as.character(PlotMatrix$variability.explained))
-  plot <-
-    ggplot(data = PlotMatrix, aes(x = factor.1, y = factor.2, fill = variability.explained)) +
-    geom_tile(color ="black") + scale_fill_gradient(low="white", high="steelblue4") +
-    theme(axis.text.x = element_text(angle = 90, size =11), axis.text.y = element_text(size = 11)) +
-    ggtitle(title)
-
-  return(plot)
-}
 
 ###############
 # Load Datasets
@@ -66,7 +23,11 @@ communication.NoNA <- na.omit(aggregate.communication)
 activity <-
   read.csv("chronobiome/Carsten_GingerIO/Activity_data/Activity_data_w_results_over_4_months_1min-res.csv")
 
-# Format date and time
+#######################################################
+# Process data, combine activity and communication sets
+#######################################################
+
+# Standardize dates and times to be "hours from 0th hour of 2014-10-21"
 communication.NoNA$Date <- substr(communication.NoNA$start, 0, 10)
 communication.NoNA$Days <- chron(communication.NoNA$Date, 
                                  format=c(dates="y-m-d")) - chron("2014-10-21", 
@@ -106,6 +67,7 @@ communication.df <- communication.NoNA %>%
                    Communication.amplitude = mean(instantaneous.amplitude),
                    Communication.period = mean(instantaneous.period),
                    Communication.phase = mean(instantaneous.phase))
+
 # Subset activity dataset to include only TimeSubjectIndex recordings
 # also present in the communication dataset, take average of each variable at 
 # each Subject/Hour combination
@@ -122,20 +84,14 @@ activity.df <- activity %>%
                    activity.period = mean(instantaneous.period),
                    activity.phase = mean(instantaneous.phase))
 
-View(activity.df)
-communication.activity <- full_join(activity.df, communication.df, by="TimeSubjectIndex")
-
-
-
-
-
-# Name columns in transformed.communication.activity (log.X refers to log(X+1))
+communication.activity <- dplyr::full_join(activity.df, communication.df, by="TimeSubjectIndex")
 
 rownames(communication.activity) <- 1:nrow(communication.activity)
 communication.activity <- data.frame(communication.activity)
-write.table(communication.activity, "communication.activity.csv", sep=",")
 
 
+# Transform variables in communication.activity to improve normality
+# In transformed.data.activity, log.X refers to transformation log(X+1)
 transformed.communication.activity <- communication.activity %>%
   dplyr::group_by(TimeSubjectIndex) %>%
   dplyr::summarise(log.Steps = log(Steps + 1),
@@ -161,8 +117,9 @@ transformed.communication.activity <- communication.activity %>%
                    Communication.period = Communication.period,
                    Communication.phase = Communication.phase)
 
+# Save dataframes as .csv files
 
-transformed.communication.activity$TimeSubjectIndex <- NULL
-jpeg('CommunicationactivityPlot.jpg')
-PlotR2s(transformed.communication.activity, "Variability Explained in Activity and Communication Data")
-dev.off()
+write.table(communication.activity, "communication.activity.csv", sep=",")
+write.table(transformed.communication.activity, "transformed.communication.activity.csv", sep = ",")
+
+
