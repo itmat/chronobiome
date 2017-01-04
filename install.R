@@ -2,14 +2,19 @@
 # Amy Campbell 2016
 
 # Installs dependencies for the chronobiome  analysis pipeline
-
 # Install and load checkpoint package to keep track of package versioning
-install.packages("methods")
-install.packages("checkpoint", repos = "http://cran.us.r-project.org")
 
+
+mirror <- "http://cran.us.r-project.org"
+install.packages("methods", repos=mirror)
+install.packages("checkpoint", repos=mirror)
+
+library('methods')
 library("checkpoint")
-dir.create(".checkpoint")
-checkpoint("2016-12-20")
+
+
+dir.create('.checkpoint')
+checkpoint("2016-12-20", checkpointLocation='.')
 
 packages <- c(
   "readr",
