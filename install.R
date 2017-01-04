@@ -23,4 +23,6 @@ packages <- c(
   "grid",
   "gridExtra"
   )
-install.packages(packages)
+sink("session.info.txt")
+sessionInfo()
+sink()
