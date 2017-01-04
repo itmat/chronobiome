@@ -1,0 +1,33 @@
+R version 3.2.3 (2015-12-10)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 16.04.1 LTS
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] grid      methods   stats     graphics  grDevices utils     datasets 
+[8] base     
+
+other attached packages:
+ [1] gridExtra_2.2.1   chron_2.3-48      dplyr_0.5.0       reshape2_1.4.2   
+ [5] Hmisc_4.0-1       Formula_1.2-1     survival_2.40-1   lattice_0.20-34  
+ [9] ggplot2_2.2.0     readr_1.0.0       checkpoint_0.3.18
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_0.12.8         cluster_2.0.5       knitr_1.15.1       
+ [4] magrittr_1.5        splines_3.2.3       munsell_0.4.3      
+ [7] colorspace_1.3-2    R6_2.2.0            stringr_1.1.0      
+[10] plyr_1.8.4          tools_3.2.3         nnet_7.3-12        
+[13] base64_2.0          data.table_1.10.0   htmlTable_1.7      
+[16] gtable_0.2.0        DBI_0.5-1           latticeExtra_0.6-28
+[19] htmltools_0.3.5     digest_0.6.10       openssl_0.9.5      
+[22] lazyeval_0.2.0      assertthat_0.1      tibble_1.2         
+[25] Matrix_1.2-7.1      RColorBrewer_1.1-2  acepack_1.4.1      
+[28] rpart_4.1-10        evaluate_0.10       stringi_1.1.2      
+[31] scales_0.4.1        foreign_0.8-67     
