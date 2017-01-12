@@ -75,7 +75,7 @@ PlotR2s <- function(dataframe, title){
   plot <-
     ggplot(data = PlotMatrix, aes(x = f1, y = f2, fill = variability.explained)) +
     geom_tile(color ="black") + scale_fill_gradient(low="white", high="steelblue4") +
-    theme(axis.text.x = element_text(angle = 90, size =11), axis.text.y = element_text(size = 11)) +
+    theme(axis.text.x = element_text(angle = 90, size =10), axis.text.y = element_text(size = 10)) +
     ggtitle(title) + xlab("Factor 1") + ylab("Factor 2")
   return(plot)
 }
@@ -138,10 +138,8 @@ dev.off()
 communication.activity <- (read.csv("communication.activity.csv"))
 communication.activity['subject'] <- (apply(communication.activity, 1, parsesubject, 2))
 
-communication.activity <- communication.activity[c()]
 subj <- data.frame(communication.activity$subject)
 length <- as.numeric(dim(communication.activity)[2])
-
 Matrix_For_PCA <- communication.activity[,3:(length-1)]
 Act_Com_PCA <- prcomp(Matrix_For_PCA, scale.=TRUE)
 ActCom_PCA_Matrix <- data.frame(Act_Com_PCA$x)
