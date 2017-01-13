@@ -94,8 +94,7 @@ heartrate.df <- heartrate %>%
 diastolic.df <- diastolic %>%
   dplyr::group_by(TimeSubjectIndex) %>%
   dplyr::summarise(diastolic.bp = mean(diastolic.bp))
-View(diastolic.df)
-  
+
 systolic.df <- systolic %>%
   dplyr::group_by(TimeSubjectIndex) %>%
   dplyr::summarise(systolic.bp = mean(systolic.bp))
