@@ -39,37 +39,47 @@ GetR2 <- function(var1, var2){
 }
 
 
-PlotR2s <- function(dataframe, title){
-  # Generates geom_tile plot of the % variability explained (R2) for each variable by each other variable
-  # :param: dataframe - Dataframe to plot (each variable in the dataframe will be compared to each other
+PlotR2s <- function(chrono_df, title, BP){
+  # Generates geom_tile plot of the % variance explained (R2) for each variable by each other variable
+  # Also outputs matrix of R-squared values in .csv format with the same 
+  # :param: chrono_df - Dataframe to plot, including all variables(activity, 
+  #                     communication, and in certain time frames,
+  #                     blood pressure) to be compared in this geom_tile plot 
+  #                     note: each variable in the dataframe will be compared 
+  #                     to each other variable in the dataframe (and itself);
+  #                     because these will be compared using R-squared values 
+  #                     yielded from simple linear regression models, they 
+  #                     must be numeric 
   # :param: title - title to display on plot 
-  #  dataframe, so these must be numeric)
+  # :param: BP - True/False, indicates whether blood pressure and heartrate data are included
   r2Matrix <- c()
-  for (a in colnames(dataframe)) {
-    for (b in colnames(dataframe)) {
+  for (a in colnames(chrono_df)) {
+    for (b in colnames(chrono_df)) {
       r2Matrix <-
         rbind(r2Matrix,
-              GetR2(as.matrix(dataframe[a]),
-                    as.matrix(dataframe[b])
+              GetR2(as.matrix(chrono_df[a]),
+                    as.matrix(chrono_df[b])
               ))
     }
   }
   PlotMatrix <- data.frame(r2Matrix)
   colnames(PlotMatrix) <- c("factor.1", "factor.2", "variability.explained")
-
   PlotMatrix$variability.explained <- as.numeric(as.character(PlotMatrix$variability.explained))
   
-  # Order variables for 4 month activity/communication dataset
-  if(title=="Variability Explained in Activity and Communication Data"){
-    f1 = factor(PlotMatrix$factor.1, levels(PlotMatrix$factor.1)[c(7, 8, 9 , 6, 18, 22, 21, 20, 4, 16, 15, 14, 1, 2, 3, 5, 17, 19, 10, 13, 12, 11)])
-    f2 = factor(PlotMatrix$factor.2, levels(PlotMatrix$factor.2)[c(7, 8, 9 , 6, 18, 22, 21, 20, 4, 16, 15, 14, 1, 2, 3, 5, 17, 19, 10, 13, 12, 11)])           
+  # Order variables using their alphabetically-determined level indices such that activraphy, actigraphy circadian, 
+  # communication, communication circadian, and biometric variables are grouped together in the output chart
+  sequence_actcomBP = c(8, 9, 10, 7, 21, 26, 25, 24, 5, 19, 18, 17, 1,
+                        2, 3, 6, 20, 22, 13, 16, 15, 14, 23, 4, 11, 27, 12)
+  sequence_actcom =  c(7, 8, 9 , 6, 18, 22, 21, 20, 4, 16, 15, 14, 1,
+                       2, 3, 5, 17, 19, 10, 13, 12, 11)
+  if(identical(BP, FALSE)){
+    f1 = factor(PlotMatrix$factor.1, levels(PlotMatrix$factor.1)[sequence_actcom])
+    f2 = factor(PlotMatrix$factor.2, levels(PlotMatrix$factor.2)[sequence_actcom])           
   }
   # Order variables for 48 hour communication/activity/BP dataset
   else{
-    f1 <- factor(PlotMatrix$factor.1, levels(PlotMatrix$factor.1)[c(8, 9, 10, 7, 21, 26, 25, 24, 5, 19, 18, 17, 1,
-                                                                    2, 3, 6, 20, 22, 13, 16, 15, 14, 23, 4, 11, 27, 12)])
-    f2 <- factor(PlotMatrix$factor.2, levels(PlotMatrix$factor.2)[c(8, 9, 10, 7, 21, 26, 25, 24, 5, 19, 18, 17, 1,
-                                                                    2, 3, 6, 20, 22, 13, 16, 15, 14, 23, 4, 11, 27, 12)])
+    f1 <- factor(PlotMatrix$factor.1, levels(PlotMatrix$factor.1)[sequence_actcomBP])
+    f2 <- factor(PlotMatrix$factor.2, levels(PlotMatrix$factor.2)[sequence_actcomBP])
   }
   # generate geom_tile plot
   plot <-
@@ -86,7 +96,7 @@ parsesubject <- function(row, half){
   # :param: row - the entire row of the dataframe
   # :param: half - indicates whether the "subject" information
   # is in the first or second half of the string
-  timesubjectindex <- row[1]
+  timesubjectindex <- row["TimeSubjectIndex"]
   strlist <- (strsplit(toString(timesubjectindex), "_"))
   
   if(toString(half)=="2"){
@@ -100,35 +110,103 @@ parsesubject <- function(row, half){
 ############################################
 # List of times to include in 48 hour window
 ############################################
-window1.begin <- as.numeric((chron("12/01/2014", format=c(dates="m/d/y")) - chron("2014-10-21", format=c(dates="y-m-d")) -1)*24 + 10)
-window1.end <- as.numeric((chron("12/03/2014", format=c(dates="m/d/y")) - chron("2014-10-21", format=c(dates="y-m-d"))-1)*24 + 10)
+window1.begin <- as.numeric((chron("12/01/2014", format=c(dates="m/d/y")) - chron("2014-10-21",
+                                                          format=c(dates="y-m-d")) -1)*24 + 10)
+window1.end <- as.numeric((chron("12/03/2014", format=c(dates="m/d/y")) - chron("2014-10-21", 
+                                                          format=c(dates="y-m-d"))-1)*24 + 10)
 
-window2.begin <- as.numeric((chron("12/15/2014", format=c(dates="m/d/y")) - chron("2014-10-21", format=c(dates="y-m-d")) -1)*24 + 10)
-window2.end <- as.numeric((chron("12/17/2014", format=c(dates="m/d/y")) - chron("2014-10-21", format=c(dates="y-m-d"))-1)*24 + 10)
+window2.begin <- as.numeric((chron("12/15/2014", format=c(dates="m/d/y")) - chron("2014-10-21", 
+                                                          format=c(dates="y-m-d")) -1)*24 + 10)
+
+window2.end <- as.numeric((chron("12/17/2014", format=c(dates="m/d/y")) - chron("2014-10-21", 
+                                                          format=c(dates="y-m-d"))-1)*24 + 10)
 
 TimeList<- c(seq(window1.begin, window1.end), seq(window2.begin, window2.end))
-
+TimeList_window1 <- c(seq(window1.begin, window1.end))
+TimeList_window2 <- c(seq(window2.begin, window2.end))
 
 ###############################
 # Heatmap of variance explained
 ###############################
 
-transformed.communication.activity <- read.csv("transformed.communication.activity.csv")
-transformed.communication.activity["X"] = NULL
+transformed.communication.activity <- readr::read_csv("transformed.communication.activity.csv")
+transformed.communication.activity["X1"] = NULL
 
-# 48 Hours containing measurements of blood pressure, heart rate
-BP_HR <- read.csv("heartrate.bp.csv")
+# Two 48 Hour visits containing measurements of blood pressure, heart rate
+BP_HR <- readr::read_csv("heartrate.bp.csv")
 Full <- dplyr::full_join(BP_HR, transformed.communication.activity, by="TimeSubjectIndex")
 bp.HR.com.act <- na.omit(Full)
-
 postscript("Variability.Act.Com.BP.eps")
-PlotR2s(bp.HR.com.act[,5:dim(bp.HR.com.act)[2]], "Variability Explained in Activity, Communication, Biometric Data (48 Hours)")
+PlotR2s(bp.HR.com.act[,5:dim(bp.HR.com.act)[2]], 
+        "Variance Explained in Activity, Communication, Biometric Data (Visits 1 and 2)", TRUE)
 dev.off()
+
+# 48 hour visit 1
+Visit1_bp.HR.com.act <- subset(bp.HR.com.act, Times %in% TimeList_window1)
+
+postscript("Varability.Act.Com.BP.Visit1")
+PlotR2s(Visit1_bp.HR.com.act[, 5:dim(Visit1_bp.HR.com.act)[2]],
+        "Variance Explained in Activity, Communication, Biometric Data(Visit 1)", TRUE)
+dev.off()
+
+# 48 hour visit 2
+Visit2_bp.HR.com.act <- subset(bp.HR.com.act, Times %in% TimeList_window2)
+postscript("Varability.Act.Com.BP.Visit2")
+PlotR2s(Visit2_bp.HR.com.act[, 5:dim(Visit2_bp.HR.com.act)[2]],
+        "Variance Explained in Activity, Communication, Biometric Data (Visit 2)", TRUE)
+dev.off()
+
 
 # All four months (no blood pressure/heart rate data)
 transformed.communication.activity["TimeSubjectIndex"] <- NULL
 postscript("Variability.Activity.Communication.eps",  width = 480, height = 480)
-PlotR2s(transformed.communication.activity, "Variability Explained in Activity and Communication Data")
+PlotR2s(transformed.communication.activity,
+        "Variance Explained in Activity and Communication Data", FALSE)
+dev.off()
+
+# Both Visits by Subject 
+bp.HR.com.act["Subject"] <- (apply(bp.HR.com.act, 1, parsesubject, 2))
+
+# Subject HCR001 
+HCR001_set <- subset(bp.HR.com.act, Subject=="HCR001")
+HCR001_set["Subject"] <- NULL
+postscript("HCR001_Variance.eps",  width = 480, height = 480)
+PlotR2s(HCR001_set[, 5:dim(HCR001_set)[2]], "Variance Explained in HCR001", TRUE)
+dev.off()
+
+# HCR003
+HCR003_set <- subset(bp.HR.com.act, Subject=="HCR003")
+HCR003_set["Subject"] <- NULL
+postscript("HCR003_Variance.eps",  width = 480, height = 480)
+PlotR2s(HCR003_set[, 5:dim(HCR003_set)[2]], "Variance Explained in HCR003", TRUE)
+dev.off()
+
+
+HCR004_set <- subset(bp.HR.com.act, Subject=="HCR004")
+HCR004_set["Subject"] <- NULL
+postscript("HCR004_Variance.eps",  width = 480, height = 480)
+PlotR2s(HCR004_set[, 5:dim(HCR004_set)[2]], "Variance Explained in HCR004", TRUE)
+dev.off()
+
+# HCR006
+HCR006_set <- subset(bp.HR.com.act, Subject=="HCR006")
+HCR006_set["Subject"] <- NULL
+postscript("HCR006_Variance.eps",  width = 480, height = 480)
+PlotR2s(HCR006_set[, 5:dim(HCR006_set)[2]], "Variance Explained in HCR006", TRUE)
+dev.off()
+
+# HCR008
+HCR008_set <- subset(bp.HR.com.act, Subject=="HCR008")
+HCR008_set["Subject"] <- NULL
+postscript("HCR008_Variance.eps",  width = 480, height = 480)
+PlotR2s(HCR008_set[, 5:dim(HCR008_set)[2]], "Variance Explained in HCR008", TRUE)
+dev.off()
+
+# HCR009
+HCR009_set <- subset(bp.HR.com.act, Subject=="HCR009")
+HCR009_set["Subject"] <- NULL
+postscript("HCR009_Variance.eps",  width = 480, height = 480)
+PlotR2s(HCR009_set[, 5:dim(HCR009_set)[2]], "Variance Explained in HCR009", TRUE)
 dev.off()
 
 ################################
@@ -138,6 +216,7 @@ dev.off()
 communication.activity <- (read.csv("communication.activity.csv"))
 communication.activity['subject'] <- (apply(communication.activity, 1, parsesubject, 2))
 
+TimeSubj <- data.frame(communication.activity$TimeSubjectIndex)
 subj <- data.frame(communication.activity$subject)
 length <- as.numeric(dim(communication.activity)[2])
 Matrix_For_PCA <- communication.activity[,3:(length-1)]
@@ -147,17 +226,10 @@ ActCom_PCA_Matrix <- data.frame(Act_Com_PCA$x)
 ActCom_PCA_Matrix["Subject"] <- subj
 write.table(Act_Com_PCA$rotation, "Act_Com_Loadings.csv", sep=",")
 
-# Subsetting for 48 Hour Window
-window1.begin <- as.numeric((chron("12/01/2014", format=c(dates="m/d/y")) - chron("2014-10-21", format=c(dates="y-m-d")) -1)*24 + 10)
-window1.end <- as.numeric((chron("12/03/2014", format=c(dates="m/d/y")) - chron("2014-10-21", format=c(dates="y-m-d"))-1)*24 + 10)
 
-window2.begin <- as.numeric((chron("12/15/2014", format=c(dates="m/d/y")) - chron("2014-10-21", format=c(dates="y-m-d")) -1)*24 + 10)
-window2.end <- as.numeric((chron("12/17/2014", format=c(dates="m/d/y")) - chron("2014-10-21", format=c(dates="y-m-d"))-1)*24 + 10)
-
-TimeList<- c(seq(window1.begin, window1.end), seq(window2.begin, window2.end))
-
-TimeSubj <- data.frame(rownames(ActCom_PCA_Matrix))
-ActCom_PCA_Matrix["TimesOnly"] <- apply(TimeSubj, 1, parsesubject, 1)
+ActCom_PCA_Matrix["TimeSubjectIndex"] <- TimeSubj
+  
+ActCom_PCA_Matrix["TimesOnly"] <- apply(ActCom_PCA_Matrix, 1, parsesubject, 1)
 
 windowed_ActCom_PCA <- subset(ActCom_PCA_Matrix, TimesOnly %in% TimeList)
 
@@ -167,32 +239,43 @@ windowed_ActCom_PCA <- subset(ActCom_PCA_Matrix, TimesOnly %in% TimeList)
 colorblind_Palette <- c("#000000", "#0072B2", "#56B4E9", "#F0E442", "#D55E00", "#CC79A7")
 
 postscript("Act_Com_PCAPlotAll.eps", width=480, height=480)
-p1 <- qplot(x=PC2, y=PC3, data=ActCom_PCA_Matrix, colour=Subject) + scale_colour_manual(values=colorblind_Palette)
-p2 <- qplot(x=PC1, y=PC3, data=ActCom_PCA_Matrix, colour=Subject) + scale_colour_manual(values=colorblind_Palette)
-p3 <- qplot(x=PC1, y=PC2, data=ActCom_PCA_Matrix, colour=Subject) + scale_colour_manual(values=colorblind_Palette)
-grid.arrange(p1, p2, p3, ncol=3, top="Principal Components for Combined Activity and Communication (All Measurements)")
+p1 <- qplot(x=PC2, y=PC3, data=ActCom_PCA_Matrix, colour=Subject) + 
+            scale_colour_manual(values=colorblind_Palette)
+p2 <- qplot(x=PC1, y=PC3, data=ActCom_PCA_Matrix, colour=Subject) + 
+            scale_colour_manual(values=colorblind_Palette)
+p3 <- qplot(x=PC1, y=PC2, data=ActCom_PCA_Matrix, colour=Subject) + 
+            scale_colour_manual(values=colorblind_Palette)
+grid.arrange(p1, p2, p3, ncol=3, 
+             top="Principal Components for Combined Activity and Communication (All Measurements)")
 dev.off()
 
 postscript("Act_Com_PCAPlot_48.eps")
-p_1 <- qplot(x=PC2, y=PC3, data=windowed_ActCom_PCA, colour=Subject) + scale_colour_manual(values=colorblind_Palette) 
-p_2 <- qplot(x=PC1, y=PC3, data=windowed_ActCom_PCA, colour=Subject) + scale_colour_manual(values=colorblind_Palette)
-p_3 <- qplot(x=PC1, y=PC2, data=windowed_ActCom_PCA, colour=Subject) + scale_colour_manual(values=colorblind_Palette)
-grid.arrange(p_1, p_2, p_3, ncol=3, top="Principal Components for Combined Activity and Communication (Visits 1 and 2)")
+p_1 <- qplot(x=PC2, y=PC3, data=windowed_ActCom_PCA, colour=Subject) +
+             scale_colour_manual(values=colorblind_Palette) 
+p_2 <- qplot(x=PC1, y=PC3, data=windowed_ActCom_PCA, colour=Subject) +
+             scale_colour_manual(values=colorblind_Palette)
+p_3 <- qplot(x=PC1, y=PC2, data=windowed_ActCom_PCA, colour=Subject) +
+             scale_colour_manual(values=colorblind_Palette)
+grid.arrange(p_1, p_2, p_3, ncol=3,
+             top="Principal Components for Combined Activity and Communication (Visits 1 and 2)")
 dev.off()
 
 postscript("Facets_Act_Com_PC2PC3.eps")
 fp_1 <- p_1 + facet_grid(. ~Subject)
-grid.arrange(fp_1, ncol=1, top ="Principal Components for Combined Activity and Communication (Visits 1 and 2)")
+grid.arrange(fp_1, ncol=1,
+             top ="Principal Components for Combined Activity and Communication (Visits 1 and 2)")
 dev.off()
 
 postscript("Facets_Act_Com_PC1PC3.eps")
 fp_2 <- p_2 + facet_grid(. ~Subject) 
-grid.arrange(fp_2, ncol=1, top ="Principal Components for Combined Activity and Communication (Visits 1 and 2)")
+grid.arrange(fp_2, ncol=1, 
+             top ="Principal Components for Combined Activity and Communication (Visits 1 and 2)")
 dev.off()
 
 postscript("Facets_Act_Com_PC1PC2.eps")
 fp_3 <- p_3 + facet_grid(. ~Subject) 
-grid.arrange(fp_3, ncol=1, top ="Principal Components for Combined Activity and Communication (Visits 1 and 2)")
+grid.arrange(fp_3, ncol=1, 
+             top ="Principal Components for Combined Activity and Communication (Visits 1 and 2)")
 dev.off()
 
 
