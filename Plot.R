@@ -222,8 +222,9 @@ energy["Times"] <- apply(energy, 1, parsesubject, 1)
 Full.with.energy <- dplyr::full_join(bp.HR.com.act, energy, by="TimeSubjectIndex")
 Full.with.energy <- na.omit(Full.with.energy)
 Full.with.energy["Subject"] <- NULL
+postscript("Variance_Explained_WithEnergy.eps")
 PlotR2s(Full.with.energy[, 6:dim(Full.with.energy)[2]-1], "Variance Explained in Activity, Communication, Blood Pressure, and Energy Variables", "somethingelse")
-
+dev.off()
 ################################
 # Communication and activity PCA
 ################################
