@@ -20,10 +20,8 @@ aggregate.communication <-
 
 # Unreturned calls has a very high occurance of NA values
 aggregate.communication$Unreturned.Calls <- NULL
-
 # Having removed Unreturned Calls, eliminate rows with missing values
 communication.NoNA <- na.omit(aggregate.communication)
-
 
 activity <-
   read.csv("chronobiome/Carsten_GingerIO/Activity_data/Activity_data_w_results_over_4_months_1min-res.csv")
@@ -32,6 +30,8 @@ activity <-
 bloodpressure.HR <- read.csv("chronobiome/Carsten_GingerIO/Biometric_data/BP_data/Raw_bp_data_for_figures.txt", sep="\t")
 bloodpressure.HR <- na.omit(bloodpressure.HR)
 
+# Energy expenditure data
+energy <- read.csv("chronobiome/Carsten_GingerIO/Activity_data/HCR001-009_ActigraphyScoring_kcals&METrate.csv")
 
 
 #######################################################
@@ -50,6 +50,7 @@ bloodpressure.HR$Days <- chron(as.character(bloodpressure.HR$Date),
                                format=c(dates="y-m-d")) - chron("2014-10-21", 
                                                                 format=c(dates="y-m-d"))
 
+energy$Days <- chron(as.character(energy$date), format=c(dates="m/d/y")) - chron("2014-10-21", format=c(dates="y-m-d"))
 
 # Set common TimeIndex and TimeSubjectIndex to synchronize the two datasets
 communication.NoNA$TimeIndex <-
@@ -65,6 +66,9 @@ activity$TimeSubjectIndex <-
 bloodpressure.HR$TimeIndex <- bloodpressure.HR$Days * 24 + bloodpressure.HR$Hour
 bloodpressure.HR$TimeSubjectIndex <-
   paste(bloodpressure.HR$TimeIndex, bloodpressure.HR$Subject, sep = "_")
+
+energy$TimeIndex <- hours(times(as.character(energy$epoch), format=c(times="h:m:s"))) + energy$Days*24
+energy$TimeSubjectIndex <- paste(energy$TimeIndex, energy$Subject.ID, sep="_")
 
 heartrate <- subset(bloodpressure.HR, Data.type=="BP.HR")
 diastolic <- subset(bloodpressure.HR, Data.type == "BP.Diastolic")
@@ -113,7 +117,8 @@ Heartrate.BP <- heartrate.df %>%
   dplyr::full_join(arterial.df, by="TimeSubjectIndex") %>%
   dplyr::full_join(pulse.df, by="TimeSubjectIndex")
   
-Heartrate.BP <- Heartrate.BP[c("TimeSubjectIndex", "Days","Times", "heart.rate","diastolic.bp","systolic.bp", "arterial.pressure", "pulse.pressure")]
+Heartrate.BP <- Heartrate.BP[c("TimeSubjectIndex", "Days","Times", "heart.rate",
+                               "diastolic.bp","systolic.bp", "arterial.pressure", "pulse.pressure")]
 
 write.csv(Heartrate.BP, "heartrate.bp.csv")
 
@@ -189,6 +194,14 @@ transformed.communication.activity <- communication.activity %>%
                    Communication.period = Communication.period,
                    Communication.phase = Communication.phase)
 
+# energy
+energy.df <- energy %>%
+  dplyr::group_by(TimeSubjectIndex) %>%
+  dplyr::summarise(log.kcals=log(mean(kcals)+1),
+                   log.MET.rate = log(mean(MET.rate)+1)
+  )
+
 # Save dataframes as .csv files
 write.csv(communication.activity, "communication.activity.csv")
 write.csv(transformed.communication.activity, "transformed.communication.activity.csv")
+write.csv(energy.df, "energy.csv")

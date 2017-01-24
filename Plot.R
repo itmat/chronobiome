@@ -1,5 +1,5 @@
 ################################################
-# Amy Campbell 2016
+# Amy Campbell 2016-2017
 #
 # Fits and plots principal component analysis of 
 # activity and communication variables
@@ -39,7 +39,7 @@ GetR2 <- function(var1, var2){
 }
 
 
-PlotR2s <- function(chrono_df, title, BP){
+PlotR2s <- function(chrono_df, title, Sequence){
   # Generates geom_tile plot of the % variance explained (R2) for each variable by each other variable
   # Also outputs matrix of R-squared values in .csv format with the same 
   # :param: chrono_df - Dataframe to plot, including all variables(activity, 
@@ -51,7 +51,13 @@ PlotR2s <- function(chrono_df, title, BP){
   #                     yielded from simple linear regression models, they 
   #                     must be numeric 
   # :param: title - title to display on plot 
-  # :param: BP - True/False, indicates whether blood pressure and heartrate data are included
+  # :param: Sequence - string indicating which order of ints to use to plot variables
+  #                    on the variance explained output plot:  
+  #                    sequence_actcom (just activity & communication variables)
+  #                    sequence_actcomBP (activity & communication with blood pressure/HR data)
+  #                    sequence_energy (for datasets including activity, communication,
+  #                                     blood pressure, and energy data)
+              
   r2Matrix <- c()
   for (a in colnames(chrono_df)) {
     for (b in colnames(chrono_df)) {
@@ -62,24 +68,32 @@ PlotR2s <- function(chrono_df, title, BP){
               ))
     }
   }
+  
   PlotMatrix <- data.frame(r2Matrix)
   colnames(PlotMatrix) <- c("factor.1", "factor.2", "variability.explained")
   PlotMatrix$variability.explained <- as.numeric(as.character(PlotMatrix$variability.explained))
-  
+
   # Order variables using their alphabetically-determined level indices such that activraphy, actigraphy circadian, 
   # communication, communication circadian, and biometric variables are grouped together in the output chart
   sequence_actcomBP = c(8, 9, 10, 7, 21, 26, 25, 24, 5, 19, 18, 17, 1,
                         2, 3, 6, 20, 22, 13, 16, 15, 14, 23, 4, 11, 27, 12)
   sequence_actcom =  c(7, 8, 9 , 6, 18, 22, 21, 20, 4, 16, 15, 14, 1,
                        2, 3, 5, 17, 19, 10, 13, 12, 11)
-  if(identical(BP, FALSE)){
+  sequence_energy = c(8, 9, 10, 7, 23, 28, 27, 26, 5, 21, 20, 18, 1,
+                      2, 3, 6, 22, 24, 13, 16, 15, 14, 25, 4, 11, 29, 12, 17, 19)
+  
+  if(Sequence == "ActCom"){
     f1 = factor(PlotMatrix$factor.1, levels(PlotMatrix$factor.1)[sequence_actcom])
     f2 = factor(PlotMatrix$factor.2, levels(PlotMatrix$factor.2)[sequence_actcom])           
   }
   # Order variables for 48 hour communication/activity/BP dataset
-  else{
+  else if(Sequence=="BP"){
     f1 <- factor(PlotMatrix$factor.1, levels(PlotMatrix$factor.1)[sequence_actcomBP])
     f2 <- factor(PlotMatrix$factor.2, levels(PlotMatrix$factor.2)[sequence_actcomBP])
+  }
+  else{
+    f1 <- factor(PlotMatrix$factor.1, levels(PlotMatrix$factor.1)[sequence_energy])
+    f2 <- factor(PlotMatrix$factor.2, levels(PlotMatrix$factor.2)[sequence_energy])
   }
   # generate geom_tile plot
   plot <-
@@ -138,7 +152,7 @@ Full <- dplyr::full_join(BP_HR, transformed.communication.activity, by="TimeSubj
 bp.HR.com.act <- na.omit(Full)
 postscript("Variability.Act.Com.BP.eps")
 PlotR2s(bp.HR.com.act[,5:dim(bp.HR.com.act)[2]], 
-        "Variance Explained in Activity, Communication, Biometric Data (Visits 1 and 2)", TRUE)
+        "Variance Explained in Activity, Communication, Biometric Data (Visits 1 and 2)", "BP")
 dev.off()
 
 # 48 hour visit 1
@@ -146,14 +160,14 @@ Visit1_bp.HR.com.act <- subset(bp.HR.com.act, Times %in% TimeList_window1)
 
 postscript("Varability.Act.Com.BP.Visit1")
 PlotR2s(Visit1_bp.HR.com.act[, 5:dim(Visit1_bp.HR.com.act)[2]],
-        "Variance Explained in Activity, Communication, Biometric Data(Visit 1)", TRUE)
+        "Variance Explained in Activity, Communication, Biometric Data(Visit 1)", "BP")
 dev.off()
 
 # 48 hour visit 2
 Visit2_bp.HR.com.act <- subset(bp.HR.com.act, Times %in% TimeList_window2)
 postscript("Varability.Act.Com.BP.Visit2")
 PlotR2s(Visit2_bp.HR.com.act[, 5:dim(Visit2_bp.HR.com.act)[2]],
-        "Variance Explained in Activity, Communication, Biometric Data (Visit 2)", TRUE)
+        "Variance Explained in Activity, Communication, Biometric Data (Visit 2)", "BP")
 dev.off()
 
 
@@ -161,7 +175,7 @@ dev.off()
 transformed.communication.activity["TimeSubjectIndex"] <- NULL
 postscript("Variability.Activity.Communication.eps",  width = 480, height = 480)
 PlotR2s(transformed.communication.activity,
-        "Variance Explained in Activity and Communication Data", FALSE)
+        "Variance Explained in Activity and Communication Data", "ActCom")
 dev.off()
 
 # Both Visits by Subject 
@@ -171,44 +185,54 @@ bp.HR.com.act["Subject"] <- (apply(bp.HR.com.act, 1, parsesubject, 2))
 HCR001_set <- subset(bp.HR.com.act, Subject=="HCR001")
 HCR001_set["Subject"] <- NULL
 postscript("HCR001_Variance.eps",  width = 480, height = 480)
-PlotR2s(HCR001_set[, 5:dim(HCR001_set)[2]], "Variance Explained in HCR001", TRUE)
+PlotR2s(HCR001_set[, 5:dim(HCR001_set)[2]], "Variance Explained in HCR001", "BP")
 dev.off()
 
 # HCR003
 HCR003_set <- subset(bp.HR.com.act, Subject=="HCR003")
 HCR003_set["Subject"] <- NULL
 postscript("HCR003_Variance.eps",  width = 480, height = 480)
-PlotR2s(HCR003_set[, 5:dim(HCR003_set)[2]], "Variance Explained in HCR003", TRUE)
+PlotR2s(HCR003_set[, 5:dim(HCR003_set)[2]], "Variance Explained in HCR003", "BP")
 dev.off()
 
 
 HCR004_set <- subset(bp.HR.com.act, Subject=="HCR004")
 HCR004_set["Subject"] <- NULL
 postscript("HCR004_Variance.eps",  width = 480, height = 480)
-PlotR2s(HCR004_set[, 5:dim(HCR004_set)[2]], "Variance Explained in HCR004", TRUE)
+PlotR2s(HCR004_set[, 5:dim(HCR004_set)[2]], "Variance Explained in HCR004", "BP")
 dev.off()
 
 # HCR006
 HCR006_set <- subset(bp.HR.com.act, Subject=="HCR006")
 HCR006_set["Subject"] <- NULL
 postscript("HCR006_Variance.eps",  width = 480, height = 480)
-PlotR2s(HCR006_set[, 5:dim(HCR006_set)[2]], "Variance Explained in HCR006", TRUE)
+PlotR2s(HCR006_set[, 5:dim(HCR006_set)[2]], "Variance Explained in HCR006", "BP")
 dev.off()
 
 # HCR008
 HCR008_set <- subset(bp.HR.com.act, Subject=="HCR008")
 HCR008_set["Subject"] <- NULL
 postscript("HCR008_Variance.eps",  width = 480, height = 480)
-PlotR2s(HCR008_set[, 5:dim(HCR008_set)[2]], "Variance Explained in HCR008", TRUE)
+PlotR2s(HCR008_set[, 5:dim(HCR008_set)[2]], "Variance Explained in HCR008", "BP")
 dev.off()
 
 # HCR009
 HCR009_set <- subset(bp.HR.com.act, Subject=="HCR009")
 HCR009_set["Subject"] <- NULL
 postscript("HCR009_Variance.eps",  width = 480, height = 480)
-PlotR2s(HCR009_set[, 5:dim(HCR009_set)[2]], "Variance Explained in HCR009", TRUE)
+PlotR2s(HCR009_set[, 5:dim(HCR009_set)[2]], "Variance Explained in HCR009", "BP")
 dev.off()
 
+energy <- read.csv("energy.csv")
+energy["X"] <- NULL
+energy["Times"] <- apply(energy, 1, parsesubject, 1)
+
+Full.with.energy <- dplyr::full_join(bp.HR.com.act, energy, by="TimeSubjectIndex")
+Full.with.energy <- na.omit(Full.with.energy)
+Full.with.energy["Subject"] <- NULL
+postscript("Variance_Explained_WithEnergy.eps")
+PlotR2s(Full.with.energy[, 6:dim(Full.with.energy)[2]-1], "Variance Explained in Activity, Communication, Blood Pressure, and Energy Variables", "somethingelse")
+dev.off()
 ################################
 # Communication and activity PCA
 ################################

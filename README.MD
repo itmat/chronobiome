@@ -4,7 +4,7 @@ Chronobiome Data Analyses
 ---------------------------------------------------------------------------------
 Repo Contents
 ---------------------------------------------------------------------------------
-* ** chronobiome.sh**
+* **chronobiome.sh**
   - Shell script, runs the scripts below
 * **install.R**
    - Installs necessary R dependencies
@@ -12,12 +12,13 @@ Repo Contents
    - Outputs:
   - *session.info.txt*
 * **Process_Activity_Communication_BP.R** 
-   - Assigns common hour/subject index to all datapoints in activity, communication, and blood pressure/HR data
+   - Assigns common hour/subject index to all datapoints in activity, communication, blood pressure/HR, and energy data
    - Transforms activity and communication variables to improve normality
    - Outputs:
  - *transformed.community.activity.csv*
  - *community.activity.csv* 
  - *heartrate.bp.csv*
+ - *energy.csv*
 * **Plot.R**
    - Performs PCA on combined activity and communication data across all 4 months
    - Generates R-squared (variability explained) heatmaps for activity & communication variables for all 4 months and for activity, communication, and blood pressure / heart rate variables 
@@ -33,4 +34,5 @@ Repo Contents
  - *Plasma_Proteins_PCA.eps*
  - *Plasma_Metabs_PCA.eps*
  - *Macronutrients.eps*
+ - *Variance_Explained_WithEnergy.eps*
  
