@@ -1,5 +1,5 @@
 ################################################
-# Amy Campbell 2016
+# Amy Campbell 2016-2017
 #
 # Fits and plots principal component analysis of 
 # activity and communication variables
@@ -51,7 +51,13 @@ PlotR2s <- function(chrono_df, title, Sequence){
   #                     yielded from simple linear regression models, they 
   #                     must be numeric 
   # :param: title - title to display on plot 
-  # :param: BP - True/False, indicates whether blood pressure and heartrate data are included
+  # :param: Sequence - string indicating which order of ints to use to plot variables
+  #                    on the variance explained output plot:  
+  #                    sequence_actcom (just activity & communication variables)
+  #                    sequence_actcomBP (activity & communication with blood pressure/HR data)
+  #                    sequence_energy (for datasets including activity, communication,
+  #                                     blood pressure, and energy data)
+              
   r2Matrix <- c()
   for (a in colnames(chrono_df)) {
     for (b in colnames(chrono_df)) {
@@ -66,14 +72,16 @@ PlotR2s <- function(chrono_df, title, Sequence){
   PlotMatrix <- data.frame(r2Matrix)
   colnames(PlotMatrix) <- c("factor.1", "factor.2", "variability.explained")
   PlotMatrix$variability.explained <- as.numeric(as.character(PlotMatrix$variability.explained))
-  print(levels(PlotMatrix$factor.1))
+
   # Order variables using their alphabetically-determined level indices such that activraphy, actigraphy circadian, 
   # communication, communication circadian, and biometric variables are grouped together in the output chart
   sequence_actcomBP = c(8, 9, 10, 7, 21, 26, 25, 24, 5, 19, 18, 17, 1,
                         2, 3, 6, 20, 22, 13, 16, 15, 14, 23, 4, 11, 27, 12)
   sequence_actcom =  c(7, 8, 9 , 6, 18, 22, 21, 20, 4, 16, 15, 14, 1,
                        2, 3, 5, 17, 19, 10, 13, 12, 11)
-  sequence_energy = c(8, 9, 10, 7, 23, 28, 27, 26, 5, 21, 20, 18, 1, 2, 3, 6, 22, 24, 13, 16, 15, 14, 25, 4, 11, 29, 12, 17, 19)
+  sequence_energy = c(8, 9, 10, 7, 23, 28, 27, 26, 5, 21, 20, 18, 1,
+                      2, 3, 6, 22, 24, 13, 16, 15, 14, 25, 4, 11, 29, 12, 17, 19)
+  
   if(Sequence == "ActCom"){
     f1 = factor(PlotMatrix$factor.1, levels(PlotMatrix$factor.1)[sequence_actcom])
     f2 = factor(PlotMatrix$factor.2, levels(PlotMatrix$factor.2)[sequence_actcom])           

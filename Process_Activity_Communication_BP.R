@@ -20,10 +20,9 @@ aggregate.communication <-
 
 # Unreturned calls has a very high occurance of NA values
 aggregate.communication$Unreturned.Calls <- NULL
-View(aggregate.communication)
 # Having removed Unreturned Calls, eliminate rows with missing values
 communication.NoNA <- na.omit(aggregate.communication)
-View(communication.NoNA)
+
 activity <-
   read.csv("chronobiome/Carsten_GingerIO/Activity_data/Activity_data_w_results_over_4_months_1min-res.csv")
 
@@ -202,9 +201,6 @@ energy.df <- energy %>%
                    log.MET.rate = log(mean(MET.rate)+1)
   )
 
-plot(hist((log(energy.df$MET.rate+1))^(-1)))
-plot(hist(energy.df$MET.rate+1))
-plot(hist(energy.df$kcals))
 # Save dataframes as .csv files
 write.csv(communication.activity, "communication.activity.csv")
 write.csv(transformed.communication.activity, "transformed.communication.activity.csv")
