@@ -357,51 +357,51 @@ dev.off()
 Full.with.energy["Subject"] <- (apply(Full.with.energy, 1, parsesubject, 2))
 
 # Subject HCR001 
-HCR001_set <- subset(Full.with.energy, Subject=="HCR001")
-HCR001_set["Subject"] <- NULL
+HCR001.set <- subset(Full.with.energy, Subject=="HCR001")
+HCR001.set["Subject"] <- NULL
 postscript("HCR001_Variance_BothVisits.eps",  width = 480, height = 480)
-PlotR2s(HCR001_set[, 6:dim(HCR001_set)[2]-1], "Variance Explained in HCR001",
+PlotR2s(HCR001.set[, 6:dim(HCR001.set)[2]-1], "Variance Explained in HCR001",
         "energy")
 dev.off()
 
 # HCR003
-HCR003_set <- subset(Full.with.energy, Subject == "HCR003")
-HCR003_set["Subject"] <- NULL
+HCR003.set <- subset(Full.with.energy, Subject == "HCR003")
+HCR003.set["Subject"] <- NULL
 postscript("HCR003_Variance_BothVisits.eps",  width = 480, height = 480)
-PlotR2s(HCR003_set[, 6:dim(HCR003_set)[2] - 1], "Variance Explained in HCR003",
+PlotR2s(HCR003.set[, 6:dim(HCR003.set)[2] - 1], "Variance Explained in HCR003",
         "energy")
 dev.off()
   
 #HCR004
-HCR004_set <- subset(Full.with.energy, Subject == "HCR004")
-HCR004_set["Subject"] <- NULL
+HCR004.set <- subset(Full.with.energy, Subject == "HCR004")
+HCR004.set["Subject"] <- NULL
 postscript("HCR004_Variance_BothVisits.eps",  width = 480, height = 480)
-PlotR2s(HCR004_set[, 6:dim(HCR004_set)[2] - 1], "Variance Explained in HCR004",
+PlotR2s(HCR004.set[, 6:dim(HCR004.set)[2] - 1], "Variance Explained in HCR004",
         "energy")
 dev.off()
 
 # HCR006
-HCR006_set <- subset(Full.with.energy, Subject == "HCR006")
-HCR006_set["Subject"] <- NULL
+HCR006.set <- subset(Full.with.energy, Subject == "HCR006")
+HCR006.set["Subject"] <- NULL
 postscript("HCR006_Variance_BothVisits.eps",  width = 480, height = 480)
-PlotR2s(HCR006_set[, 6:dim(HCR006_set)[2] - 1], "Variance Explained in HCR006",
+PlotR2s(HCR006.set[, 6:dim(HCR006.set)[2] - 1], "Variance Explained in HCR006",
         "energy")
 dev.off()
   
 # HCR008
-HCR008_set <- subset(Full.with.energy, Subject == "HCR008")
-HCR008_set["Subject"] <- NULL
+HCR008.set <- subset(Full.with.energy, Subject == "HCR008")
+HCR008.set["Subject"] <- NULL
 postscript("HCR008_Variance_BothVisits.eps",  width = 480, height = 480)
-PlotR2s(HCR008_set[, 6:dim(HCR008_set)[2]-1], "Variance Explained in HCR008",
+PlotR2s(HCR008.set[, 6:dim(HCR008.set)[2]-1], "Variance Explained in HCR008",
         "energy")
 dev.off()
 
 
 # HCR009
-HCR009_set <- subset(Full.with.energy, Subject == "HCR009")
-HCR009_set["Subject"] <- NULL
+HCR009.set <- subset(Full.with.energy, Subject == "HCR009")
+HCR009.set["Subject"] <- NULL
 postscript("HCR009_Variance_BothVisits.eps",  width = 480, height = 480)
-PlotR2s(HCR009_set[, 5:(dim(HCR009_set)[2]-1)], "Variance Explained in HCR009",
+PlotR2s(HCR009.set[, 5:(dim(HCR009.set)[2]-1)], "Variance Explained in HCR009",
         "energy")
 dev.off()
 
@@ -409,100 +409,100 @@ dev.off()
 ################################
 # VISIT 1
 # Subject HCR001 
-HCR001_set1 <- subset(subset(Full.with.energy, Subject == "HCR001"), Days<=43)
-HCR001_set1["Subject"] <- NULL
+HCR001.set1 <- subset(subset(Full.with.energy, Subject == "HCR001"), Days<=43)
+HCR001.set1["Subject"] <- NULL
 postscript("HCR001_Variance_visit1.eps",  width = 480, height = 480)
-PlotR2s(HCR001_set1[, 5:(dim(HCR001_set1)[2] - 1)],
+PlotR2s(HCR001.set1[, 5:(dim(HCR001.set1)[2] - 1)],
         "Variance Explained in HCR001 (visit 1)", "energy")
 dev.off()
 
 # HCR003
-HCR003_set1 <- subset(subset(Full.with.energy, Subject == "HCR003"), (Days <= 43))
-HCR003_set1["Subject"] <- NULL
+HCR003.set1 <- subset(subset(Full.with.energy, Subject == "HCR003"), (Days <= 43))
+HCR003.set1["Subject"] <- NULL
 postscript("HCR003_Variance_visit1.eps",  width = 480, height = 480)
-PlotR2s(HCR003_set1[, 5:(dim(HCR003_set1)[2] - 1)],
+PlotR2s(HCR003.set1[, 5:(dim(HCR003.set1)[2] - 1)],
         "Variance Explained in HCR003 (visit 1)", "energy")
 dev.off()
 
 #HCR004
-HCR004_set1 <- subset(subset(Full.with.energy, Subject == "HCR004"), (Days<=45))
-HCR004_set1["Subject"] <- NULL
+HCR004.set1 <- subset(subset(Full.with.energy, Subject == "HCR004"), (Days<=45))
+HCR004.set1["Subject"] <- NULL
 postscript("HCR004_Variance_visit1.eps",  width = 480, height = 480)
-PlotR2s(HCR004_set1[, 5:(dim(HCR004_set1)[2] - 1)],
+PlotR2s(HCR004.set1[, 5:(dim(HCR004.set1)[2] - 1)],
         "Variance Explained in HCR004 (visit 1)", "energy")
 dev.off()
 
 # HCR006
-HCR006_set1 <- subset(subset(Full.with.energy, Subject == "HCR006"), (Days<=44))
-HCR006_set1["Subject"] <- NULL
+HCR006.set1 <- subset(subset(Full.with.energy, Subject == "HCR006"), (Days<=44))
+HCR006.set1["Subject"] <- NULL
 postscript("HCR006_Variance_visit1.eps",  width = 480, height = 480)
-PlotR2s(HCR006_set1[, 5:(dim(HCR006_set1)[2] - 1)],
+PlotR2s(HCR006.set1[, 5:(dim(HCR006.set1)[2] - 1)],
         "Variance Explained in HCR006 (visit 1)", "energy")
 dev.off()
 
 # HCR008
-HCR008_set1 <- subset(subset(Full.with.energy, Subject == "HCR008"), Days<=45)
-HCR008_set1["Subject"] <- NULL
+HCR008.set1 <- subset(subset(Full.with.energy, Subject == "HCR008"), Days<=45)
+HCR008.set1["Subject"] <- NULL
 postscript("HCR008_Variance_visit1.eps",  width = 480, height = 480)
-PlotR2s(HCR008_set1[, 5:(dim(HCR008_set1)[2]-1)],
+PlotR2s(HCR008.set1[, 5:(dim(HCR008.set1)[2]-1)],
         "Variance Explained in HCR008 (visit 1)", "energy")
 dev.off()
 
 # HCR009
-HCR009_set1 <- subset(subset(Full.with.energy, Subject == "HCR009"), Days <= 51)
-HCR009_set1["Subject"] <- NULL
+HCR009.set1 <- subset(subset(Full.with.energy, Subject == "HCR009"), Days <= 51)
+HCR009.set1["Subject"] <- NULL
 postscript("HCR009_Variance_visit1.eps",  width = 480, height = 480)
-PlotR2s(HCR009_set1[, 5:(dim(HCR009_set1)[2]-1)],
+PlotR2s(HCR009.set1[, 5:(dim(HCR009.set1)[2]-1)],
         "Variance Explained in HCR009 (visit 1)", "energy")
 dev.off()
 
 
 # VISIT 2
 # Subject HCR001 
-HCR001_set2 <- subset(subset(Full.with.energy, Subject=="HCR001"), Days>=55)
-HCR001_set2["Subject"] <- NULL
+HCR001.set2 <- subset(subset(Full.with.energy, Subject=="HCR001"), Days>=55)
+HCR001.set2["Subject"] <- NULL
 postscript("HCR001_Variance_visit2.eps",  width = 480, height = 480)
-PlotR2s(HCR001_set2[, 5:(dim(HCR001_set2)[2]-1)],
+PlotR2s(HCR001.set2[, 5:(dim(HCR001.set2)[2]-1)],
         "Variance Explained in HCR001 (visit 2)", "energy")
 dev.off()
 
 # HCR003
-HCR003_set2 <- subset(subset(Full.with.energy, Subject == "HCR003"), Days >= 55)
-HCR003_set2["Subject"] <- NULL
+HCR003.set2 <- subset(subset(Full.with.energy, Subject == "HCR003"), Days >= 55)
+HCR003.set2["Subject"] <- NULL
 postscript("HCR003_Variance_visit2.eps",  width = 480, height = 480)
-PlotR2s(HCR003_set2[, 5:(dim(HCR003_set2)[2] - 1)],
+PlotR2s(HCR003.set2[, 5:(dim(HCR003.set2)[2] - 1)],
         "Variance Explained in HCR003 (visit 2)", "energy")
 dev.off()
 
 #HCR004
-HCR004_set2 <- subset(subset(Full.with.energy, Subject == "HCR004"), Days >= 55)
-HCR004_set2["Subject"] <- NULL
+HCR004.set2 <- subset(subset(Full.with.energy, Subject == "HCR004"), Days >= 55)
+HCR004.set2["Subject"] <- NULL
 postscript("HCR004_Variance_visit2.eps",  width = 480, height = 480)
-PlotR2s(HCR004_set2[, 5:(dim(HCR004_set2)[2] - 1)],
+PlotR2s(HCR004.set2[, 5:(dim(HCR004.set2)[2] - 1)],
         "Variance Explained in HCR004 (visit 2)", "energy")
 dev.off()
 
 # HCR006
-HCR006_set2 <- subset(subset(Full.with.energy, Subject == "HCR006"), Days >= 57)
-HCR006_set2["Subject"] <- NULL
+HCR006.set2 <- subset(subset(Full.with.energy, Subject == "HCR006"), Days >= 57)
+HCR006.set2["Subject"] <- NULL
 postscript("HCR006_Variance_visit2.eps",  width = 480, height = 480)
-PlotR2s(HCR006_set2[, 5:(dim(HCR006_set2)[2]-1)],
+PlotR2s(HCR006.set2[, 5:(dim(HCR006.set2)[2]-1)],
         "Variance Explained in HCR006 (visit 2)", "energy")
 dev.off()
 
 # HCR008
-HCR008_set2 <- subset(subset(Full.with.energy, Subject == "HCR008"), Days >=55)
-HCR008_set2["Subject"] <- NULL
+HCR008.set2 <- subset(subset(Full.with.energy, Subject == "HCR008"), Days >=55)
+HCR008.set2["Subject"] <- NULL
 postscript("HCR008_Variance_visit2.eps",  width = 480, height = 480)
-PlotR2s(HCR008_set2[, 5:(dim(HCR008_set2)[2] - 1)],
+PlotR2s(HCR008.set2[, 5:(dim(HCR008.set2)[2] - 1)],
         "Variance Explained in HCR008 (visit 2)", "energy")
 dev.off()
 
 # HCR009
-HCR009_set2 <- subset(subset(Full.with.energy, Subject == "HCR009"), Days >= 62)
-HCR009_set2["Subject"] <- NULL
+HCR009.set2 <- subset(subset(Full.with.energy, Subject == "HCR009"), Days >= 62)
+HCR009.set2["Subject"] <- NULL
 postscript("HCR009_Variance_visit2.eps",  width = 480, height = 480)
-PlotR2s(HCR009_set2[, 5:(dim(HCR009_set2)[2]-1)],
+PlotR2s(HCR009.set2[, 5:(dim(HCR009.set2)[2]-1)],
         "Variance Explained in HCR009 (visit 2)", "energy")
 dev.off()
 
@@ -521,20 +521,20 @@ TimeSubj <- data.frame(communication.activity$TimeSubjectIndex)
 subj <- data.frame(communication.activity$subject)
 length <- as.numeric(dim(communication.activity)[2])
 Matrix_For_PCA <- communication.activity[,3:(length-1)]
-Act_Com_PCA <- prcomp(Matrix_For_PCA, scale.= TRUE)
-ActCom_PCA_Matrix <- data.frame(Act_Com_PCA$x)
+act.com.PCA <- prcomp(Matrix_For_PCA, scale.= TRUE)
+act.com.pca.matrix <- data.frame(act.com.PCA$x)
 
-ActCom_PCA_Matrix["Subject"] <- subj
-write.table(Act_Com_PCA$rotation, "Act_Com_Loadings.csv", sep = ",")
+act.com.pca.matrix["Subject"] <- subj
+write.table(act.com.PCA$rotation, "Act_Com_Loadings.csv", sep = ",")
 
 
-ActCom_PCA_Matrix["TimeSubjectIndex"] <- TimeSubj
+act.com.pca.matrix["TimeSubjectIndex"] <- TimeSubj
   
-ActCom_PCA_Matrix["TimesOnly"] <- 
-  apply(ActCom_PCA_Matrix, 1, parsesubject, 1)
+act.com.pca.matrix["TimesOnly"] <- 
+  apply(act.com.pca.matrix, 1, parsesubject, 1)
 
 windowed_ActCom_PCA <- 
-  subset(ActCom_PCA_Matrix, TimesOnly %in% TimeList)
+  subset(act.com.pca.matrix, TimesOnly %in% TimeList)
 
 ###########
 # PCA Plots
@@ -542,19 +542,19 @@ windowed_ActCom_PCA <-
 colorblind_Palette <- c("#000000", "#0072B2", "#56B4E9", "#F0E442",
                         "#D55E00", "#CC79A7")
 
-postscript("Act_Com_PCAPlotAll.eps", width=480, height=480)
-p1 <- qplot(x = PC2, y = PC3, data = ActCom_PCA_Matrix, colour = Subject) + 
+postscript("act.com.PCA.PlotAll.eps", width=480, height=480)
+p1 <- qplot(x = PC2, y = PC3, data = act.com.pca.matrix, colour = Subject) + 
             scale_colour_manual(values = colorblind_Palette)
-p2 <- qplot(x = PC1, y = PC3, data = ActCom_PCA_Matrix, colour = Subject) + 
+p2 <- qplot(x = PC1, y = PC3, data = act.com.pca.matrix, colour = Subject) + 
             scale_colour_manual(values = colorblind_Palette)
-p3 <- qplot(x = PC1, y = PC2, data = ActCom_PCA_Matrix, colour = Subject) + 
+p3 <- qplot(x = PC1, y = PC2, data = act.com.pca.matrix, colour = Subject) + 
             scale_colour_manual(values = colorblind_Palette)
 grid.arrange(p1, p2, p3, ncol = 3, 
              top = paste("Principal Components for Combined Activity and ",
                          "Communication (All Measurements)"))
 dev.off()
 
-postscript("Act_Com_PCAPlot_48.eps")
+postscript("act.com.PCAPlot_48.eps")
 p_1 <- qplot(x = PC2, y = PC3, data = windowed_ActCom_PCA, colour = Subject) +
              scale_colour_manual(values=colorblind_Palette) 
 p_2 <- qplot(x = PC1, y = PC3, data = windowed_ActCom_PCA, colour = Subject) +
