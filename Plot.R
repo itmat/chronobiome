@@ -28,7 +28,7 @@ library("gridExtra")
 ##################
 
 
-GetR2 <- function(var1, var2){
+GetR2 <- function(var1, var2) {
   # Generates a simple linear regression model of var1~var2, and returns
   # R-squared for that model to represent proportion of V1 explained by V2
   # :param: var1 - Variable to 'be explained' by var2
@@ -40,7 +40,7 @@ GetR2 <- function(var1, var2){
 }
   
 
-PlotR2s <- function(chrono_df, title, Sequence){
+PlotR2s <- function(chrono_df, title, Sequence) {
   # Generates geom_tile plot of the % variance explained (R2) for each variable
   # by each other variable.
   # Also outputs matrix of R-squared values in .csv format with the same 
@@ -55,10 +55,10 @@ PlotR2s <- function(chrono_df, title, Sequence){
   # :param: title - title to display on plot 
   # :param: Sequence - string indicating which order of ints to use to plot 
   #                    variables on the variance explained output plot:
-  #                    sequence_actcom (just activity/communication variables)
-  #                    sequence_actcomBP (activity & communication
+  #                    sequence.actcom (just activity/communication variables)
+  #                    sequence.actcomBP (activity & communication
   #                                       with blood pressure/HR data)
-  #                    sequence_energy (for datasets including activity,
+  #                    sequence.energy (for datasets including activity,
   #                                     communication, blood pressure,
   #                                     and energy data)
   #                                     
@@ -74,61 +74,58 @@ PlotR2s <- function(chrono_df, title, Sequence){
     }
   }
   
-  PlotMatrix <- data.frame(r2Matrix)
-  colnames(PlotMatrix) <- c("factor.1", "factor.2", "variability.explained")
-  PlotMatrix$variability.explained <- as.numeric(as.character(
-    PlotMatrix$variability.explained))
+  plot.matrix <- data.frame(r2Matrix)
+  colnames(plot.matrix) <- c("factor.1", "factor.2", "variability.explained")
+  plot.matrix$variability.explained <-
+    as.numeric(as.character(plot.matrix$variability.explained))
   # Order variables using their alphabetically-determined level indices such 
   # that activraphy, actigraphy circadian, 
   # communication, communication circadian, and biometric variables are
   # grouped together in the output chart
-  sequence_actcomBP = c(8, 9, 10, 7, 21, 26, 25, 24, 5, 19, 18, 17, 1,
+  sequence.actcomBP <- c(8, 9, 10, 7, 21, 26, 25, 24, 5, 19, 18, 17, 1,
                         2, 3, 6, 20, 22, 13, 16, 15, 14, 23, 4, 11, 27, 12)
-  sequence_actcom = c(7, 8, 9 , 6, 18, 22, 21, 20, 4, 16, 15, 14, 1,
+  sequence.actcom <- c(7, 8, 9 , 6, 18, 22, 21, 20, 4, 16, 15, 14, 1,
                        2, 3, 5, 17, 19, 10, 13, 12, 11)
-  sequence_energy = c(8, 9, 10, 7, 23, 28, 27, 26, 5, 21, 20, 18, 1, 2, 3,
+  sequence.energy <- c(8, 9, 10, 7, 23, 28, 27, 26, 5, 21, 20, 18, 1, 2, 3,
                       6, 22, 19, 17, 24, 13, 16, 15, 14, 25, 4, 11, 29, 12)
-  sequence_4monthenergy = c(7, 8, 9, 6, 20, 24, 23, 22, 4, 18, 17, 15, 1, 2,
+  sequence.4monthenergy <- c(7, 8, 9, 6, 20, 24, 23, 22, 4, 18, 17, 15, 1, 2,
                             3, 5, 19, 16, 14, 21, 10, 13, 12, 11)
 
   if (Sequence == "ActCom"){
-    f1 = factor(PlotMatrix$factor.1,
-                levels(PlotMatrix$factor.1)[sequence_actcom])
-    f2 = factor(PlotMatrix$factor.2,
-                levels(PlotMatrix$factor.2)[sequence_actcom])           
-  }
-  # Order variables for 48 hour communication/activity/BP dataset
-  else if (Sequence == "BP"){
-    f1 <- factor(PlotMatrix$factor.1,
-                 levels(PlotMatrix$factor.1)[sequence_actcomBP])
-    f2 <- factor(PlotMatrix$factor.2,
-                 levels(PlotMatrix$factor.2)[sequence_actcomBP])
-  }
-  else if (Sequence == "energy"){
-    f1 <- factor(PlotMatrix$factor.1,
-                 levels(PlotMatrix$factor.1)[sequence_energy])
-    f2 <- factor(PlotMatrix$factor.2,
-                 levels(PlotMatrix$factor.2)[sequence_energy])
+    f1 = factor(plot.matrix$factor.1,
+                levels(plot.matrix$factor.1)[sequence.actcom])
+    f2 = factor(plot.matrix$factor.2,
+                levels(plot.matrix$factor.2)[sequence.actcom])           
+  } else if (Sequence == "BP") {
+    f1 <- factor(plot.matrix$factor.1,
+                 levels(plot.matrix$factor.1)[sequence.actcomBP])
+    f2 <- factor(plot.matrix$factor.2,
+                 levels(plot.matrix$factor.2)[sequence.actcomBP])
+  } else if (Sequence == "energy") {
+    f1 <- factor(plot.matrix$factor.1,
+                 levels(plot.matrix$factor.1)[sequence.energy])
+    f2 <- factor(plot.matrix$factor.2,
+                 levels(plot.matrix$factor.2)[sequence.energy])
   } else {
-    f1 <- factor(PlotMatrix$factor.1,
-                 levels(PlotMatrix$factor.1)[sequence_4monthenergy])
-    f2 <- factor(PlotMatrix$factor.2,
-                 levels(PlotMatrix$factor.2)[sequence_4monthenergy]) 
+    f1 <- factor(plot.matrix$factor.1,
+                 levels(plot.matrix$factor.1)[sequence.4monthenergy])
+    f2 <- factor(plot.matrix$factor.2,
+                 levels(plot.matrix$factor.2)[sequence.4monthenergy]) 
   }
   # generate geom_tile plot
   plot <-
-    ggplot(data = PlotMatrix,
+    ggplot(data = plot.matrix,
            aes(x = f1, y = f2, fill = variability.explained)) +
            geom_tile(color = "black") +
-           scale_fill_gradient(low="white", high = "steelblue4") +
-           theme(axis.text.x = element_text(angle = 90, size = 8) +
+           scale_fill_gradient(low = "white", high = "steelblue4") +
+           theme(axis.text.x = element_text(angle = 90, size = 8),
            axis.text.y = element_text(size = 8)) + ggtitle(title) +
            xlab("Factor 1") + ylab("Factor 2")
 
   return(plot)
 }
 
-parsesubject <- function(row, half){
+ParseSubject <- function(row, half) {
   # Function to be applied to all rows of 
   # the dataframe in question
   # :param: row - the entire row of the dataframe
@@ -137,17 +134,34 @@ parsesubject <- function(row, half){
   timesubjectindex <- row["TimeSubjectIndex"]
   strlist <- (strsplit(toString(timesubjectindex), "_"))
   
-  if(toString(half) == "2"){
+  if(toString(half) == "2") {
     return(unlist(strlist)[2])
-  }
-  else{
+  } else {
     return(as.numeric(unlist(strlist)[1]))
   }
 }
 
+PlotPCA <- function(PCdata, title, filename) {
+  # :param: PCdata - matrix of principle components for the dataset
+  # :param: Title - string representing the title to be shared by the 
+  #                 three side-by-side plots
+  # :param: filename - file name, including ".eps" suffix, for the plot
+  postscript(filename, width = 480, height = 480)
+  plot1 <- qplot(x = PC2, y=PC3, data = PCdata, colour = Subject) +
+    scale_colour_manual(values = colorblind_Palette) 
+  plot2 <- qplot(x = PC1, y = PC3, data = PCdata, colour = Subject) +
+    scale_colour_manual(values = colorblind_Palette) 
+  plot3 <- qplot(x = PC1, y = PC2, data = PCdata, colour = Subject) +
+    scale_colour_manual(values = colorblind_Palette) 
+  grid.arrange(plot1, plot2, plot3, ncol = 3,
+               top = title)
+  dev.off()
+  }
+
 TimeList_window1 <- c(seq(922, 1232))
 TimeList_window2 <- c(seq(1328, 1545))
 
+TimeList <- c(TimeList_window1, TimeList_window2)
 ###############################
 # Heatmap of variance explained
 ###############################
@@ -158,23 +172,22 @@ transformed.communication.activity["X1"] = NULL
 
 # Two 48 Hour visits containing measurements of blood pressure, heart rate
 BP_HR <- readr::read_csv("heartrate.bp.csv")
-Full <- dplyr::full_join(BP_HR, transformed.communication.activity,
+act.com.bp.hr.vars4months <- dplyr::full_join(BP_HR, transformed.communication.activity,
                          by = "TimeSubjectIndex")
-bp.HR.com.act <- na.omit(Full)
+bp.HR.com.act <- na.omit(act.com.bp.hr.vars4months)
 postscript("Variability.Act.Com.BP.eps")
 PlotR2s(bp.HR.com.act[,5:dim(bp.HR.com.act)[2]], 
-        paste("Variance Explained in Activity,", 
-              " Communication, Biometric Data (Visits 1 and 2)", "BP"))
+        paste0("Variance Explained in Activity,", 
+              "Communication, Biometric Data (Visits 1 and 2)"), "BP")
 
 dev.off()
-
 
 # 48 hour visit 1
 Visit1_bp.HR.com.act <- subset(bp.HR.com.act, Times %in% TimeList_window1)
 
 postscript("Varability.Act.Com.BP.Visit1.Feb.eps")
 PlotR2s(Visit1_bp.HR.com.act[, 5:dim(Visit1_bp.HR.com.act)[2]],
-        "Variance Explained in Activity, Communication, Biometric Data(Visit 1)",
+        " Variance Explained in Activity, Communication, Biometric Data(Visit 1)",
         "BP")
 dev.off()
 
@@ -187,7 +200,7 @@ dev.off()
 
 energy <- read.csv("energy.csv")
 energy["X"] <- NULL
-energy["Times"] <- apply(energy, 1, parsesubject, 1)
+energy["Times"] <- apply(energy, 1, ParseSubject, 1)
 
 Energy.4months <- dplyr::full_join(transformed.communication.activity, energy,
                                    by = "TimeSubjectIndex")
@@ -199,11 +212,74 @@ Full.with.energy <- na.omit(Full.with.energy)
 Full.with.energy["Subject"] <- NULL
 
 postscript("Variance_Explained_WithEnergy.eps")
+# Plot R^2s excluding Times variable
 PlotR2s(Full.with.energy[, 6:dim(Full.with.energy)[2] - 1],
-        paste("Variance Explained in Activity, Communication, Blood Pressure,",
+        paste0("Variance Explained in Activity, Communication, Blood Pressure,",
               " and Energy Variables"),
-        "somethingelse")
+        "4monthenergy")
 dev.off()
+
+# All four months by subject (no blood pressure/heart rate/ ActCom data)
+transformed.communication.activity["Subject"] <- (apply(transformed.communication.activity, 1, ParseSubject, 2))
+
+# Subject HCR001 
+HCR001.4months <- subset(transformed.communication.activity, Subject == "HCR001")
+HCR001.4months["Subject"] <- NULL
+HCR001.4months["TimeSubjectIndex"] <- NULL
+
+postscript("HCR001_Variance.4months.eps",  width = 480, height = 480)
+PlotR2s(HCR001.4months, "Variance Explained in HCR001 (all 4 months)",
+        "ActCom")
+dev.off()
+
+# HCR003
+HCR003.4months <- subset(transformed.communication.activity, Subject == "HCR003")
+HCR003.4months["Subject"] <- NULL
+HCR003.4months["TimeSubjectIndex"] <- NULL
+postscript("HCR003_Variance.4months.eps",  width = 480, height = 480)
+PlotR2s(HCR003.4months, "Variance Explained in HCR003 (all 4 months)",
+        "ActCom")
+dev.off()
+
+#HCR003
+HCR004.4months <- subset(transformed.communication.activity, Subject == "HCR004")
+HCR004.4months["Subject"] <- NULL
+HCR004.4months["TimeSubjectIndex"] <- NULL
+
+postscript("HCR004_Variance.4months.eps",  width = 480, height = 480)
+PlotR2s(HCR004.4months, "Variance Explained in HCR004 (all 4 months)",
+        "ActCom")
+dev.off()
+
+# HCR006
+HCR006.4months <- subset(transformed.communication.activity, Subject == "HCR006")
+HCR006.4months["Subject"] <- NULL
+HCR006.4months["TimeSubjectIndex"] <- NULL
+
+postscript("HCR006_Variance.4months.eps",  width = 480, height = 480)
+PlotR2s(HCR006.4months, "Variance Explained in HCR006 (all 4 months)",
+        "ActCom")
+dev.off()
+
+# HCR008
+HCR008.4months <- subset(transformed.communication.activity, Subject == "HCR008")
+HCR008.4months["Subject"] <- NULL
+HCR008.4months["TimeSubjectIndex"] <- NULL
+postscript("HCR008_Variance.4months.eps",  width = 480, height = 480)
+PlotR2s(HCR008.4months, "Variance Explained in HCR008 (all 4 months)",
+        "ActCom")
+dev.off()
+
+# HCR009
+HCR009.4months <- subset(transformed.communication.activity, Subject == "HCR009")
+HCR009.4months["Subject"] <- NULL
+HCR009.4months["TimeSubjectIndex"] <- NULL
+
+postscript("HCR009_Variance.4months.eps",  width = 480, height = 480)
+PlotR2s(HCR009.4months, "Variance Explained in HCR009 (all 4 months)",
+        "ActCom")
+dev.off()
+
 
 # All four months (no blood pressure/heart rate data)
 transformed.communication.activity["TimeSubjectIndex"] <- NULL
@@ -217,66 +293,66 @@ dev.off()
 ######################################
 
 # All four months by subject (with energy)
-Energy.4months["Subject"] <- (apply(Energy.4months, 1, parsesubject, 2))
+Energy.4months["Subject"] <- (apply(Energy.4months, 1, ParseSubject, 2))
 Energy.4months["X1"] <- NULL
 Energy.4months["Times"] <- NULL
 # Subject HCR001 
-HCR001_4months <- subset(Energy.4months, Subject == "HCR001")
-HCR001_4months["Subject"] <- NULL
-HCR001_4months["TimeSubjectIndex"] <- NULL
-postscript("HCR001_Variance_4months_withEnergy.eps",
+HCR001.4months <- subset(Energy.4months, Subject == "HCR001")
+HCR001.4months["Subject"] <- NULL
+HCR001.4months["TimeSubjectIndex"] <- NULL
+postscript("HCR001_Variance.4months_withEnergy.eps",
            width = 480, height = 480)
-PlotR2s(HCR001_4months, "Variance Explained in HCR001 (all 4 months)",
+PlotR2s(HCR001.4months, "Variance Explained in HCR001 (all 4 months)",
         "4monthenergy")
 dev.off()
 
 # HCR003
-HCR003_4months <- subset(Energy.4months, Subject=="HCR003")
-HCR003_4months["Subject"] <- NULL
-HCR003_4months["TimeSubjectIndex"] <- NULL
-postscript("HCR003_Variance_4months_withEnergy.eps",
+HCR003.4months <- subset(Energy.4months, Subject == "HCR003")
+HCR003.4months["Subject"] <- NULL
+HCR003.4months["TimeSubjectIndex"] <- NULL
+postscript("HCR003_Variance.4months_withEnergy.eps",
            width = 480, height = 480)
-PlotR2s(HCR003_4months, "Variance Explained in HCR003 (all 4 months)",
+PlotR2s(HCR003.4months, "Variance Explained in HCR003 (all 4 months)",
         "4monthenergy")
 dev.off()
 
 #HCR003
-HCR004_4months <- subset(Energy.4months, Subject == "HCR004")
-HCR004_4months["Subject"] <- NULL
-HCR004_4months["TimeSubjectIndex"] <- NULL
+HCR004.4months <- subset(Energy.4months, Subject == "HCR004")
+HCR004.4months["Subject"] <- NULL
+HCR004.4months["TimeSubjectIndex"] <- NULL
 
-postscript("HCR004_Variance_4months_withEnergy_withEnergy.eps",
+postscript("HCR004_Variance.4months_withEnergy_withEnergy.eps",
            width = 480, height = 480)
-PlotR2s(HCR004_4months, "Variance Explained in HCR004 (all 4 months)",
+PlotR2s(HCR004.4months, "Variance Explained in HCR004 (all 4 months)",
         "4monthenergy")
 dev.off()
 
 # HCR006
-HCR006_4months <- subset(Energy.4months, Subject == "HCR006")
-HCR006_4months["Subject"] <- NULL
-HCR006_4months["TimeSubjectIndex"] <- NULL
+HCR006.4months <- subset(Energy.4months, Subject == "HCR006")
+HCR006.4months["Subject"] <- NULL
+HCR006.4months["TimeSubjectIndex"] <- NULL
 
-postscript("HCR006_Variance_4months_withEnergy.eps", width = 480, height = 480)
-PlotR2s(HCR006_4months, "Variance Explained in HCR006 (all 4 months)",
+postscript("HCR006_Variance.4months_withEnergy.eps", width = 480, height = 480)
+PlotR2s(HCR006.4months, "Variance Explained in HCR006 (all 4 months)",
         "4monthenergy")
 dev.off()
 
 # HCR008
-HCR008_4months <- subset(Energy.4months, Subject=="HCR008")
-HCR008_4months["Subject"] <- NULL
-HCR008_4months["TimeSubjectIndex"] <- NULL
-postscript("HCR008_Variance_4months_withEnergy.eps", width = 480, height = 480)
-PlotR2s(HCR008_4months, "Variance Explained in HCR008 (all 4 months)",
+HCR008.4months <- subset(Energy.4months, Subject == "HCR008")
+HCR008.4months["Subject"] <- NULL
+HCR008.4months["TimeSubjectIndex"] <- NULL
+postscript("HCR008_Variance.4months_withEnergy.eps", width = 480, height = 480)
+PlotR2s(HCR008.4months, "Variance Explained in HCR008 (all 4 months)",
         "4monthenergy")
 dev.off()
 
 # HCR009
-HCR009_4months <- subset(Energy.4months, Subject=="HCR009")
-HCR009_4months["Subject"] <- NULL
-HCR009_4months["TimeSubjectIndex"] <- NULL
+HCR009.4months <- subset(Energy.4months, Subject == "HCR009")
+HCR009.4months["Subject"] <- NULL
+HCR009.4months["TimeSubjectIndex"] <- NULL
 
-postscript("HCR009_Variance_4months_withEnergy.eps", width = 480, height = 480)
-PlotR2s(HCR009_4months, "Variance Explained in HCR009 (all 4 months)",
+postscript("HCR009_Variance.4months_withEnergy.eps", width = 480, height = 480)
+PlotR2s(HCR009.4months, "Variance Explained in HCR009 (all 4 months)",
         "4monthenergy")
 dev.off()
 
@@ -288,79 +364,15 @@ PlotR2s(Energy.4months,
         "Variance Explained in Activity and Communication Data (4 months)",
         "4monthenergy")
 dev.off()
-View(Energy.4months)
-####
-
-
-# All four months by subject (no blood pressure/heart rate/ ActCom data)
-transformed.communication.activity["Subject"] <- 
-  (apply(transformed.communication.activity, 1, parsesubject, 2))
-# Subject HCR001 
-HCR001_4months <- subset(transformed.communication.activity, Subject == "HCR001")
-HCR001_4months["Subject"] <- NULL
-HCR001_4months["TimeSubjectIndex"] <- NULL
-postscript("HCR001_Variance_4months.eps",  width = 480, height = 480)
-PlotR2s(HCR001_4months, "Variance Explained in HCR001 (all 4 months)",
-        "ActCom")
-dev.off()
-
-# HCR003
-HCR003_4months <- subset(transformed.communication.activity, Subject == "HCR003")
-HCR003_4months["Subject"] <- NULL
-HCR003_4months["TimeSubjectIndex"] <- NULL
-postscript("HCR003_Variance_4months.eps",  width = 480, height = 480)
-PlotR2s(HCR003_4months, "Variance Explained in HCR003 (all 4 months)",
-        "ActCom")
-dev.off()
-
-#HCR003
-HCR004_4months <- subset(transformed.communication.activity, Subject == "HCR004")
-HCR004_4months["Subject"] <- NULL
-HCR004_4months["TimeSubjectIndex"] <- NULL
-
-postscript("HCR004_Variance_4months.eps",  width = 480, height = 480)
-PlotR2s(HCR004_4months, "Variance Explained in HCR004 (all 4 months)",
-        "ActCom")
-dev.off()
-
-# HCR006
-HCR006_4months <- subset(transformed.communication.activity, Subject == "HCR006")
-HCR006_4months["Subject"] <- NULL
-HCR006_4months["TimeSubjectIndex"] <- NULL
-
-postscript("HCR006_Variance_4months.eps",  width = 480, height = 480)
-PlotR2s(HCR006_4months, "Variance Explained in HCR006 (all 4 months)",
-        "ActCom")
-dev.off()
-
-# HCR008
-HCR008_4months <- subset(transformed.communication.activity, Subject == "HCR008")
-HCR008_4months["Subject"] <- NULL
-HCR008_4months["TimeSubjectIndex"] <- NULL
-postscript("HCR008_Variance_4months.eps",  width = 480, height = 480)
-PlotR2s(HCR008_4months, "Variance Explained in HCR008 (all 4 months)",
-        "ActCom")
-dev.off()
-
-# HCR009
-HCR009_4months <- subset(transformed.communication.activity, Subject=="HCR009")
-HCR009_4months["Subject"] <- NULL
-HCR009_4months["TimeSubjectIndex"] <- NULL
-
-postscript("HCR009_Variance_4months.eps",  width = 480, height = 480)
-PlotR2s(HCR009_4months, "Variance Explained in HCR009 (all 4 months)",
-        "ActCom")
-dev.off()
-
 
 # Both Visits by Subject all variables 
-Full.with.energy["Subject"] <- (apply(Full.with.energy, 1, parsesubject, 2))
+Full.with.energy["Subject"] <- (apply(Full.with.energy, 1, ParseSubject, 2))
 
 # Subject HCR001 
-HCR001.set <- subset(Full.with.energy, Subject=="HCR001")
+HCR001.set <- subset(Full.with.energy, Subject == "HCR001")
 HCR001.set["Subject"] <- NULL
 postscript("HCR001_Variance_BothVisits.eps",  width = 480, height = 480)
-PlotR2s(HCR001.set[, 6:dim(HCR001.set)[2]-1], "Variance Explained in HCR001",
+PlotR2s(HCR001.set[, 6:dim(HCR001.set)[2] - 1], "Variance Explained in HCR001",
         "energy")
 dev.off()
 
@@ -372,7 +384,7 @@ PlotR2s(HCR003.set[, 6:dim(HCR003.set)[2] - 1], "Variance Explained in HCR003",
         "energy")
 dev.off()
   
-#HCR004
+# HCR004
 HCR004.set <- subset(Full.with.energy, Subject == "HCR004")
 HCR004.set["Subject"] <- NULL
 postscript("HCR004_Variance_BothVisits.eps",  width = 480, height = 480)
@@ -392,16 +404,15 @@ dev.off()
 HCR008.set <- subset(Full.with.energy, Subject == "HCR008")
 HCR008.set["Subject"] <- NULL
 postscript("HCR008_Variance_BothVisits.eps",  width = 480, height = 480)
-PlotR2s(HCR008.set[, 6:dim(HCR008.set)[2]-1], "Variance Explained in HCR008",
+PlotR2s(HCR008.set[, 6:dim(HCR008.set)[2] - 1], "Variance Explained in HCR008",
         "energy")
 dev.off()
-
 
 # HCR009
 HCR009.set <- subset(Full.with.energy, Subject == "HCR009")
 HCR009.set["Subject"] <- NULL
 postscript("HCR009_Variance_BothVisits.eps",  width = 480, height = 480)
-PlotR2s(HCR009.set[, 5:(dim(HCR009.set)[2]-1)], "Variance Explained in HCR009",
+PlotR2s(HCR009.set[, 5:(dim(HCR009.set)[2] - 1)], "Variance Explained in HCR009",
         "energy")
 dev.off()
 
@@ -409,7 +420,7 @@ dev.off()
 ################################
 # VISIT 1
 # Subject HCR001 
-HCR001.set1 <- subset(subset(Full.with.energy, Subject == "HCR001"), Days<=43)
+HCR001.set1 <- subset(subset(Full.with.energy, Subject == "HCR001"), Days <= 43)
 HCR001.set1["Subject"] <- NULL
 postscript("HCR001_Variance_visit1.eps",  width = 480, height = 480)
 PlotR2s(HCR001.set1[, 5:(dim(HCR001.set1)[2] - 1)],
@@ -424,7 +435,7 @@ PlotR2s(HCR003.set1[, 5:(dim(HCR003.set1)[2] - 1)],
         "Variance Explained in HCR003 (visit 1)", "energy")
 dev.off()
 
-#HCR004
+# HCR004
 HCR004.set1 <- subset(subset(Full.with.energy, Subject == "HCR004"), (Days<=45))
 HCR004.set1["Subject"] <- NULL
 postscript("HCR004_Variance_visit1.eps",  width = 480, height = 480)
@@ -444,7 +455,7 @@ dev.off()
 HCR008.set1 <- subset(subset(Full.with.energy, Subject == "HCR008"), Days<=45)
 HCR008.set1["Subject"] <- NULL
 postscript("HCR008_Variance_visit1.eps",  width = 480, height = 480)
-PlotR2s(HCR008.set1[, 5:(dim(HCR008.set1)[2]-1)],
+PlotR2s(HCR008.set1[, 5:(dim(HCR008.set1)[2] - 1)],
         "Variance Explained in HCR008 (visit 1)", "energy")
 dev.off()
 
@@ -452,17 +463,17 @@ dev.off()
 HCR009.set1 <- subset(subset(Full.with.energy, Subject == "HCR009"), Days <= 51)
 HCR009.set1["Subject"] <- NULL
 postscript("HCR009_Variance_visit1.eps",  width = 480, height = 480)
-PlotR2s(HCR009.set1[, 5:(dim(HCR009.set1)[2]-1)],
+PlotR2s(HCR009.set1[, 5:(dim(HCR009.set1)[2] - 1)],
         "Variance Explained in HCR009 (visit 1)", "energy")
 dev.off()
 
 
 # VISIT 2
 # Subject HCR001 
-HCR001.set2 <- subset(subset(Full.with.energy, Subject=="HCR001"), Days>=55)
+HCR001.set2 <- subset(subset(Full.with.energy, Subject == "HCR001"), Days>=55)
 HCR001.set2["Subject"] <- NULL
 postscript("HCR001_Variance_visit2.eps",  width = 480, height = 480)
-PlotR2s(HCR001.set2[, 5:(dim(HCR001.set2)[2]-1)],
+PlotR2s(HCR001.set2[, 5:(dim(HCR001.set2)[2] - 1)],
         "Variance Explained in HCR001 (visit 2)", "energy")
 dev.off()
 
@@ -474,7 +485,7 @@ PlotR2s(HCR003.set2[, 5:(dim(HCR003.set2)[2] - 1)],
         "Variance Explained in HCR003 (visit 2)", "energy")
 dev.off()
 
-#HCR004
+# HCR004
 HCR004.set2 <- subset(subset(Full.with.energy, Subject == "HCR004"), Days >= 55)
 HCR004.set2["Subject"] <- NULL
 postscript("HCR004_Variance_visit2.eps",  width = 480, height = 480)
@@ -486,23 +497,20 @@ dev.off()
 HCR006.set2 <- subset(subset(Full.with.energy, Subject == "HCR006"), Days >= 57)
 HCR006.set2["Subject"] <- NULL
 postscript("HCR006_Variance_visit2.eps",  width = 480, height = 480)
-PlotR2s(HCR006.set2[, 5:(dim(HCR006.set2)[2]-1)],
+PlotR2s(HCR006.set2[, 5:(dim(HCR006.set2)[2] - 1)],
         "Variance Explained in HCR006 (visit 2)", "energy")
 dev.off()
 
 # HCR008
-HCR008.set2 <- subset(subset(Full.with.energy, Subject == "HCR008"), Days >=55)
-HCR008.set2["Subject"] <- NULL
-postscript("HCR008_Variance_visit2.eps",  width = 480, height = 480)
-PlotR2s(HCR008.set2[, 5:(dim(HCR008.set2)[2] - 1)],
-        "Variance Explained in HCR008 (visit 2)", "energy")
-dev.off()
+HCR008.set2 <- subset(subset(Full.with.energy, Subject == "HCR008"), Days >= 55)
+# HCR008.set2 is empty for the full set of variables including energy as a result of
+# missing values from visit 2.
 
 # HCR009
 HCR009.set2 <- subset(subset(Full.with.energy, Subject == "HCR009"), Days >= 62)
 HCR009.set2["Subject"] <- NULL
 postscript("HCR009_Variance_visit2.eps",  width = 480, height = 480)
-PlotR2s(HCR009.set2[, 5:(dim(HCR009.set2)[2]-1)],
+PlotR2s(HCR009.set2[, 5:(dim(HCR009.set2)[2] - 1)],
         "Variance Explained in HCR009 (visit 2)", "energy")
 dev.off()
 
@@ -515,7 +523,7 @@ dev.off()
 
 communication.activity <- (read.csv("communication.activity.csv"))
 communication.activity['subject'] <- 
-  (apply(communication.activity, 1, parsesubject, 2))
+  (apply(communication.activity, 1, ParseSubject, 2))
 
 TimeSubj <- data.frame(communication.activity$TimeSubjectIndex)
 subj <- data.frame(communication.activity$subject)
@@ -531,7 +539,7 @@ write.table(act.com.PCA$rotation, "Act_Com_Loadings.csv", sep = ",")
 act.com.pca.matrix["TimeSubjectIndex"] <- TimeSubj
   
 act.com.pca.matrix["TimesOnly"] <- 
-  apply(act.com.pca.matrix, 1, parsesubject, 1)
+  apply(act.com.pca.matrix, 1, ParseSubject, 1)
 
 windowed_ActCom_PCA <- 
   subset(act.com.pca.matrix, TimesOnly %in% TimeList)
@@ -542,275 +550,192 @@ windowed_ActCom_PCA <-
 colorblind_Palette <- c("#000000", "#0072B2", "#56B4E9", "#F0E442",
                         "#D55E00", "#CC79A7")
 
-postscript("act.com.PCA.PlotAll.eps", width=480, height=480)
-p1 <- qplot(x = PC2, y = PC3, data = act.com.pca.matrix, colour = Subject) + 
-            scale_colour_manual(values = colorblind_Palette)
-p2 <- qplot(x = PC1, y = PC3, data = act.com.pca.matrix, colour = Subject) + 
-            scale_colour_manual(values = colorblind_Palette)
-p3 <- qplot(x = PC1, y = PC2, data = act.com.pca.matrix, colour = Subject) + 
-            scale_colour_manual(values = colorblind_Palette)
-grid.arrange(p1, p2, p3, ncol = 3, 
-             top = paste("Principal Components for Combined Activity and ",
-                         "Communication (All Measurements)"))
-dev.off()
+# Activity and Energy PCA plots with PC combinations side-by-side
+PlotPCA(act.com.pca.matrix, 
+        title = paste0("Principal Components for Combined Activity and ",
+                      "Communication (All Measurements)"), 
+        filename = "act.com.PCA.PlotAll.eps")
 
-postscript("act.com.PCAPlot_48.eps")
-p_1 <- qplot(x = PC2, y = PC3, data = windowed_ActCom_PCA, colour = Subject) +
-             scale_colour_manual(values=colorblind_Palette) 
-p_2 <- qplot(x = PC1, y = PC3, data = windowed_ActCom_PCA, colour = Subject) +
-             scale_colour_manual(values=colorblind_Palette)
-p_3 <- qplot(x = PC1, y = PC2, data = windowed_ActCom_PCA, colour = Subject) +
-             scale_colour_manual(values=colorblind_Palette)
-grid.arrange(p_1, p_2, p_3, ncol = 3,
-             top = paste("Principal Components for Combined Activity",
-                         "and Communication (Visits 1 and 2)"))
-dev.off()
+PlotPCA(windowed_ActCom_PCA, 
+        title= paste0("Principal Components for Combined Activity and ",
+                      "Communication (Visits 1 and 2)"), 
+        filename ="act.com.PCAPlot_48.eps")
 
+# PC combinations individually
 postscript("Facets_Act_Com_PC2PC3.eps")
 fp_1 <- p_1 + facet_grid(. ~Subject)
 grid.arrange(fp_1, ncol = 1,
-             top = paste("Principal Components for Combined Activity",
+             top = paste0("Principal Components for Combined Activity",
                          "and Communication (Visits 1 and 2)"))
 dev.off()
 
 postscript("Facets_Act_Com_PC1PC3.eps")
 fp_2 <- p_2 + facet_grid(. ~Subject) 
 grid.arrange(fp_2, ncol = 1, 
-             top = paste("Principal Components for Combined Activity and",
+             top = paste0("Principal Components for Combined Activity and",
                          " Communication (Visits 1 and 2)"))
 dev.off()
 
 postscript("Facets_Act_Com_PC1PC2.eps")
 fp_3 <- p_3 + facet_grid(. ~Subject) 
 grid.arrange(fp_3, ncol = 1, 
-             top = paste("Principal Components for Combined Activity and", 
+             top = paste0("Principal Components for Combined Activity and", 
                          " Communication (Visits 1 and 2)"))
 dev.off()
 
 
 # Load and plot other PCAs (Generated by S. Rhodes)
-Saliva_Metabolites <- read.csv(
-  paste("chronobiome/Seth_PCA/PC_Scores/SalivaMetabolites_BothVisits",
-        "_ScoresFor10PCs.csv"))
-colnames(Saliva_Metabolites) <- c("Visit", "Subject", "Hour", "PC1", "PC2",
+
+#Saliva Metabolites
+saliva.metabolites <- read.csv(
+  file.path("chronobiome", "Seth_PCA", "PC_Scores",
+            "SalivaMetabolites_BothVisits_ScoresFor10PCs.csv"))
+colnames(saliva.metabolites) <- c("Visit", "Subject", "Hour", "PC1", "PC2",
                                   "PC3", "PC4", "PC5", "PC6", "PC7",
                                   "PC8", "PC9", "PC10")
-postscript("Saliva_Metabs_PCA.eps")
-sm1 <- qplot(x = PC2, y = PC3, data = Saliva_Metabolites, colour = Subject)
-             + scale_colour_manual(values = colorblind_Palette)
-sm2 <- qplot(x = PC1, y = PC3, data = Saliva_Metabolites, colour = Subject)
-             + scale_colour_manual(values=colorblind_Palette)
-sm3 <- qplot(x = PC1, y = PC2, data = Saliva_Metabolites, colour = Subject)
-             + scale_colour_manual(values=colorblind_Palette)
-grid.arrange(sm1, sm2, sm3, ncol = 3,
-             top =
-               "Principal Components for Saliva Metabolites(Visits 1 and 2)")
-dev.off()
+PlotPCA(saliva.metabolites, 
+        title = "Principal Components for Saliva Metabolites(Visits 1 and 2)",
+        filename = "Saliva_Metabs_PCA.eps")
 
+# Saliva Microbes
 Saliva_Microbes <-
-  read.csv(paste("chronobiome/Seth_PCA/PC_Scores/SalivaMicrobes_",
-                 "BothVisits_ScoresFor5PCs.csv"))
+  read.csv(file.path("chronobiome", "Seth_PCA", "PC_Scores", 
+                     "SalivaMicrobes_BothVisits_ScoresFor5PCs.csv"))
 colnames(Saliva_Microbes) <-(c("X", "Subject", "Hour","PC1",
                                "PC2", "PC3", "PC4", "PC5"))
-postscript("Saliva_Microbes_PCA.eps")
-smic1 <- qplot(x = PC2, y = PC3, data = Saliva_Microbes, colour = Subject) +
-              scale_colour_manual(values = colorblind_Palette) 
-smic2 <- qplot(x = PC1, y = PC3, data = Saliva_Microbes, colour=Subject) +
-              scale_colour_manual(values = colorblind_Palette) 
-smic3 <- qplot(x = PC1, y = PC2, data = Saliva_Microbes, colour = Subject) +
-              scale_colour_manual(values = colorblind_Palette)
-grid.arrange(smic1, smic2, smic3, ncol = 3,
-             top = "Principal Components for Saliva Microbes(Visits 1 and 2)")
-dev.off()
+PlotPCA(Saliva_Microbes,
+        title = "Principal Components for Saliva Microbes(Visits 1 and 2)",
+        filename = "Saliva_Microbes_PCA.eps")
 
-Plasma_Proteins <- read.csv(
-  paste("chronobiome/Seth_PCA/PC_Scores/PlasmaProteins_1stVisits_HCR009-",
-        "12hrRemove_ScoresFor10PCs.csv"))
-Plasma_Proteins <- na.omit(Plasma_Proteins)
-colnames(Plasma_Proteins) <- c("X", "Subject", "Hour", "PC1", "PC2", "PC3",
+# Plasma Proteins
+plasma.proteins <- read.csv(
+  file.path("chronobiome", "Seth_PCA", "PC_Scores", 
+            "PlasmaProteins_1stVisits_HCR009-12hrRemove_ScoresFor10PCs.csv"))
+plasma.proteins <- na.omit(plasma.proteins)
+colnames(plasma.proteins) <- c("X", "Subject", "Hour", "PC1", "PC2", "PC3",
                                "PC4", "PC5", "PC6", "PC7","PC8","PC9","PC10")
-postscript("Plasma_Proteins_PCA.eps")
-pp1 <- qplot(x = PC2, y = PC3, data = Plasma_Proteins, colour = Subject) +
-            scale_colour_manual(values = colorblind_Palette) 
-pp2 <- qplot(x = PC1, y = PC3, data = Plasma_Proteins, colour = Subject) +
-            scale_colour_manual(values = colorblind_Palette) 
-pp3 <- qplot(x = PC1, y = PC2, data = Plasma_Proteins, colour = Subject) +
-            scale_colour_manual(values = colorblind_Palette)
-grid.arrange(pp1, pp2, pp3, ncol = 3,
-             top = "Principal Components for Plasma Proteins(Visit 1)")
-dev.off()
+PlotPCA(plasma.proteins,
+        title = "Principal Components for Plasma Proteins(Visit 1)",
+        filename = "Plasma_Proteins_PCA.eps")
 
-Plasma_Metabolites <- read.csv(
-  paste("chronobiome/Seth_PCA/PC_Scores/", 
+# Plasma Metabolites
+plasma.metabolites <- read.csv(
+  file.path("chronobiome", "Seth_PCA", "PC_Scores", 
         "PlasmaMetabolites_BothVisits_ScoresFor10PCs.csv"))
-colnames(Plasma_Metabolites) <- c("Visit", "Subject", "Hour", "PC1",
+colnames(plasma.metabolites) <- c("Visit", "Subject", "Hour", "PC1",
                                   "PC2", "PC3", "PC4", "PC5", "PC6",
                                   "PC7", "PC8", "PC9", "PC10")
-postscript("Plasma_Metabs_PCA.eps")
-pm1 <- qplot(x = PC2, y = PC3, data = Plasma_Metabolites, colour = Subject) +
-            scale_colour_manual(values = colorblind_Palette)
-pm2 <- qplot(x = PC1, y = PC3, data = Plasma_Metabolites, colour = Subject) +
-            scale_colour_manual(values = colorblind_Palette) 
-pm3 <- qplot(x = PC1, y = PC2, data = Plasma_Metabolites, colour = Subject) +
-          scale_colour_manual(values = colorblind_Palette)
-grid.arrange(pm1, pm2, pm3, ncol = 3,
-             top = "Principal Components for Plasma Metabolites(Visits 1 and 2)")
-dev.off()
+PlotPCA(plasma.metabolites,
+        title = "Principal Components for Plasma Metabolites(Visits 1 and 2)",
+        filename = "Plasma_Metabs_PCA.eps")
 
+# Metabolites and microbes
+metabolites.microbiome.both<- 
+  read.csv(file.path("chronobiome", "Seth_PCA", "PC_Scores", "ScoresJan17",
+                 "MetabsAndMicrobes_BothVisits_ScoresFor5PCs.csv"))
+colnames(metabolites.microbiome.both) <- c("X", "Subject", "Hour",
+                                                 "PC1", "PC2", "PC3",
+                                                 "PC4","PC5")
+PlotPCA(metabolites.microbiome.both,
+        title = paste0("Principal Components for Metabolites and Microbes",
+                       "Combined (Visits 1 and 2)"), 
+        filename = "Metabolites_Microbes_BothVisits.eps"
+        )
+
+# Metabolites and Microbes, Visit 1
+metabolites.microbiome.visit1 <- 
+  read.csv(file.path("chronobiome", "Seth_PCA", "PC_Scores", "ScoresJan17",
+                     "MetabsAndMicrobes_Visit1_ScoresFor5PCs.csv"))
+colnames(metabolites.microbiome.visit1) <-
+  c("X", "Subject", "Hour", "PC1", "PC2", "PC3", "PC4", "PC5")
+PlotPCA(metabolites.microbiome.visit1,
+        title = paste0("Principal Components for Metabolites and Microbes",
+               "Combined (Visit 1)"),
+        filename = "Metabolites_Microbes_Visit1.eps"
+        )
+
+# Metabolites and Microbes, Visit 2
+metabolites.microbiome.visit2 <- 
+  read.csv(file.path("chronobiome", "Seth_PCA", "PC_Scores","ScoresJan17",
+                     "MetabsAndMicrobes_Visit2_ScoresFor5PCs.csv"))
+colnames(metabolites.microbiome.visit2) <- c("X", "Subject", "Hour", "PC1",
+                                             "PC2", "PC3", "PC4", "PC5")
+PlotPCA(metabolites.microbiome.visit2,
+        title = paste0("Principal Components for Metabolites",
+                     " and Microbes Combined (Visit 2)"),
+        filename = "Metabolites_Microbes_Visit2.eps"
+        )
+
+# Tri-omics PCA on Metabolites, Proteins, Microbes
+TriOmic_Visit1 <- read.csv(file.path("chronobiome", "Seth_PCA",
+                                     "PC_Scores", "ScoresJan17",
+                                     "TriOmic_Visit1_ScoresFor5PCs.csv"))
+colnames(TriOmic_Visit1) <- c("X", "Subject", "Hour", "PC1", "PC2",
+                              "PC3", "PC4", "PC5")
+PlotPCA(TriOmic_Visit1,
+        title = paste0("Principal Components for Metabolites,",
+                       " Proteins and Microbes Combined (Visit 1)"),
+        filename="TriOmic_Visit1.eps")
+
+# Seth's updated Saliva Metabolites PCA excluding an outlier
+saliva.metabolites.jan <- 
+  read.csv(file.path("chronobiome", "Seth_PCA", "PC_Scores", "ScoresJan17",
+                 "SalivaMetabolites_BothVisits_ScoresFor5PCs.csv"))
+colnames(saliva.metabolites.jan) <- c("Visit", "Subject", "Hour",
+                                      "PC1", "PC2", "PC3", "PC4", "PC5")
+PlotPCA(saliva.metabolites.jan,
+        title = "Principal Components for Saliva Metabolites(Visits 1 and 2)",
+        filename = "Saliva_Metabs_PCA.jan17.eps" )
+
+# Seth's updated Saliva Microbes PCA excluding an outlier
+Saliva_Microbes.jan <- 
+  read.csv(file.path("chronobiome", "Seth_PCA", "PC_Scores", "ScoresJan17", 
+                     "SalivaMicrobes_BothVisits_ScoresFor5PCs.csv"))
+colnames(Saliva_Microbes.jan) <- 
+  (c("X", "Subject", "Hour", "PC1", "PC2", "PC3", "PC4", "PC5"))
+PlotPCA(Saliva_Microbes.jan, 
+        title = "Principal Components for Saliva Microbes(Visits 1 and 2)",
+        filename = "Saliva_Microbes_PCA_Jan.eps")
+
+# Seth's updated Plasma Proteins PCA excluding an outlier
+
+plasma.proteins.jan <- 
+  read.csv(file.path("chronobiome", "Seth_PCA", "PC_Scores", 
+                     "ScoresJan17", "PlasmaProteins_Visit1_ScoresFor5PCs.csv"))
+plasma.proteins.jan <- na.omit(plasma.proteins.jan)
+colnames(plasma.proteins.jan) <- c("X", "Subject", "Hour",
+                                   "PC1", "PC2", "PC3", "PC4", "PC5")
+PlotPCA(plasma.proteins.jan, 
+        title = "Principal Components for Plasma Proteins(Visit 1)", 
+        filename = "Plasma_Proteins_PCA_Jan.eps")
+
+# Seth's updated Plasma Metabolites PCA excluding an outlier
+plasma.metabolites.jan <- 
+  read.csv(file.path("chronobiome", "Seth_PCA", "PC_Scores", "ScoresJan17",
+                     "PlasmaMetabolites_BothVisits_ScoresFor5PCs.csv"))
+colnames(plasma.metabolites.jan) <- c("Visit", "Subject", "Hour", "PC1",
+                                      "PC2", "PC3", "PC4", "PC5")
+PlotPCA(plasma.metabolites.jan,
+        title = paste0("Principal Components for ",
+                       "Plasma Metabolites(Visits", 
+                        " 1 and 2)"))
+
+# Macronutrients plot (Raw values rather than PCA)
 Macronutrients <- read.csv(
-  "/home/amycampbell/Downloads/MacroNutrientData_SmallerChunks_BothVisits.csv")
+  file.path("chronobiome", "MacroNutrientData_SmallerChunks_BothVisits.csv"))
 postscript("Macronutrients.eps")
 n1 <- qplot(x = Protein, y = TotalFat, data = Macronutrients, colour = Subject) +
-            scale_colour_manual(values = colorblind_Palette)
+  scale_colour_manual(values = colorblind_Palette)
 n2 <- qplot(x = Protein, y = Carbohydrate, data = Macronutrients, colour = Subject) +
-            scale_colour_manual(values=colorblind_Palette)
+  scale_colour_manual(values=colorblind_Palette)
 n3 <- qplot(x = Carbohydrate, y = TotalFat, data = Macronutrients, colour = Subject) +
-            scale_colour_manual(values=colorblind_Palette)
+  scale_colour_manual(values=colorblind_Palette)
 grid.arrange(n1, n2, n3, ncol = 3, top = "Macronutrients(Visits 1 and 2)")
 dev.off()
 
-Metabolites_Microbiome_BothVisits<- 
-  read.csv(paste("chronobiome/Seth_PCA/PC_Scores/ScoresJan17/",
-                 "MetabsAndMicrobes_BothVisits_ScoresFor5PCs.csv"))
-colnames(Metabolites_Microbiome_BothVisits) <-
-  c("X", "Subject", "Hour", "PC1", "PC2", "PC3", "PC4", "PC5")
-postscript("Metabolites_Microbes_BothVisits.eps")
-mm1 <- qplot(x = PC2, y = PC3, data = Metabolites_Microbiome_BothVisits,
-             colour = Subject) +
-  scale_colour_manual(values = colorblind_Palette)
-mm2 <- qplot(x = PC1, y = PC3, data = Metabolites_Microbiome_BothVisits,
-             colour = Subject) +
-  scale_colour_manual(values=colorblind_Palette) 
-mm3 <- qplot(x = PC1, y = PC2, data = Metabolites_Microbiome_BothVisits,
-             colour = Subject) +
-  scale_colour_manual(values = colorblind_Palette)
-grid.arrange(mm1, mm2, mm3, ncol = 3,
-             top = paste("Principal Components for Metabolites and Microbes",
-                  "Combined (Visits 1 and 2)"))
-dev.off()
-
-Metabolites_Microbiome_Visit1 <- 
-  read.csv(paste("chronobiome/Seth_PCA/PC_Scores/ScoresJan17/",
-                 "MetabsAndMicrobes_Visit1_ScoresFor5PCs.csv"))
-colnames(Metabolites_Microbiome_Visit1) <-
-  c("X", "Subject", "Hour", "PC1", "PC2", "PC3", "PC4", "PC5")
-postscript("Metabolites_Microbes_Visit1.eps")
-mm11 <- qplot(x = PC2, y = PC3, data = Metabolites_Microbiome_Visit1,
-              colour=Subject) + scale_colour_manual(values = colorblind_Palette)
-mm12 <- qplot(x = PC1, y = PC3, data = Metabolites_Microbiome_Visit1,
-              colour = Subject) + scale_colour_manual(values = colorblind_Palette) 
-mm13 <- qplot(x = PC1, y = PC2, data = Metabolites_Microbiome_Visit1,
-              colour = Subject) + scale_colour_manual(values = colorblind_Palette)
-grid.arrange(mm11, mm12, mm13, ncol = 3,
-             top = paste("Principal Components for Metabolites and Microbes",
-                         "Combined (Visit 1)"))
-dev.off()
-
-Metabolites_Microbiome_Visit2 <- read.csv(
-  paste("chronobiome/Seth_PCA/PC_Scores/ScoresJan17/MetabsAndMicrobes_Visit2",
-        "_ScoresFor5PCs.csv"))
-colnames(Metabolites_Microbiome_Visit2) <- c("X", "Subject", "Hour", "PC1",
-                                             "PC2", "PC3", "PC4", "PC5")
-postscript("Metabolites_Microbes_Visit2.eps")
-mm21 <- qplot(x = PC2, y = PC3, data = Metabolites_Microbiome_Visit2,
-              colour = Subject) +
-  scale_colour_manual(values=colorblind_Palette)
-mm22 <- qplot(x=PC1, y=PC3, data=Metabolites_Microbiome_Visit2,
-              colour=Subject) +
-  scale_colour_manual(values = colorblind_Palette) 
-mm23 <- qplot(x = PC1, y=PC2, data = Metabolites_Microbiome_Visit2,
-              colour = Subject) +
-  scale_colour_manual(values = colorblind_Palette)
-grid.arrange(mm21, mm22, mm23, ncol = 3,
-             top = paste("Principal Components for Metabolites",
-             " and Microbes Combined (Visit 2)"))
-dev.off()
-
-TriOmic_Visit1 <- read.csv(paste("chronobiome/Seth_PCA/PC_Scores/ScoresJan17",
-                                 "/TriOmic_Visit1_ScoresFor5PCs.csv"))
-colnames(TriOmic_Visit1) <- c("X", "Subject", "Hour", "PC1", "PC2",
-                              "PC3", "PC4", "PC5")
-postscript("TriOmic_Visit1.eps")
-t1 <- qplot(x = PC2, y = PC3, data = TriOmic_Visit1, colour = Subject) +
-            scale_colour_manual(values = colorblind_Palette)
-t2 <- qplot(x = PC1, y = PC3, data = TriOmic_Visit1, colour = Subject) +
-            scale_colour_manual(values = colorblind_Palette) 
-t3 <- qplot(x = PC1, y = PC2, data = TriOmic_Visit1, colour = Subject) +
-            scale_colour_manual(values = colorblind_Palette)
-grid.arrange(t1, t2, t3, ncol = 3,
-             top = paste("Principal Components for Metabolites,",
-                         " Proteins and Microbes Combined (Visit 1)"))
-dev.off()
-
-# Plot Seth's updated PCA
-Saliva_Metabolites_Jan <- 
-  read.csv(paste("chronobiome/Seth_PCA/PC_Scores/ScoresJan17/",
-                 "SalivaMetabolites_BothVisits_ScoresFor5PCs.csv"))
-colnames(Saliva_Metabolites_Jan) <- c("Visit", "Subject", "Hour",
-                                      "PC1", "PC2", "PC3", "PC4", "PC5")
-postscript("Saliva_Metabs_PCA_Jan17.eps")
-sm1 <- qplot(x = PC2, y = PC3, data = Saliva_Metabolites_Jan, colour = Subject) +
-             scale_colour_manual(values = colorblind_Palette)
-sm2 <- qplot(x = PC1, y = PC3, data = Saliva_Metabolites_Jan, colour = Subject) +
-             scale_colour_manual(values = colorblind_Palette)
-sm3 <- qplot(x = PC1, y = PC2, data = Saliva_Metabolites_Jan, colour = Subject) +
-             scale_colour_manual(values = colorblind_Palette)
-grid.arrange(sm1, sm2, sm3, ncol = 3,
-             top = "Principal Components for Saliva Metabolites(Visits 1 and 2)")
-dev.off()
-
-Saliva_Microbes_Jan <- 
-  read.csv(paste("chronobiome/Seth_PCA/PC_Scores/ScoresJan17/SalivaMicrobes_",
-                 "BothVisits_ScoresFor5PCs.csv"))
-colnames(Saliva_Microbes_Jan) <- 
-  (c("X", "Subject", "Hour", "PC1", "PC2", "PC3", "PC4", "PC5"))
-postscript("Saliva_Microbes_PCA_Jan.eps")
-smic1 <- qplot(x = PC2, y = PC3, data = Saliva_Microbes_Jan, colour = Subject) +
-              scale_colour_manual(values = colorblind_Palette) 
-smic2 <- qplot(x = PC1, y = PC3, data = Saliva_Microbes_Jan, colour = Subject) +
-              scale_colour_manual(values = colorblind_Palette) 
-smic3 <- qplot(x = PC1, y = PC2, data = Saliva_Microbes_Jan, colour = Subject) +
-              scale_colour_manual(values = colorblind_Palette)
-grid.arrange(smic1, smic2, smic3, ncol = 3,
-             top = "Principal Components for Saliva Microbes(Visits 1 and 2)")
-dev.off()
-
-Plasma_Proteins_Jan <- 
-  read.csv(paste("chronobiome/Seth_PCA/PC_Scores/ScoresJan17/",
-           "PlasmaProteins_Visit1_ScoresFor5PCs.csv"))
-Plasma_Proteins_Jan <- na.omit(Plasma_Proteins_Jan)
-colnames(Plasma_Proteins_Jan) <- c("X", "Subject", "Hour",
-                                   "PC1", "PC2", "PC3", "PC4", "PC5")
-postscript("Plasma_Proteins_PCA_Jan.eps")
-pp1 <- qplot(x = PC2, y = PC3, data = Plasma_Proteins_Jan, colour = Subject) +
-            scale_colour_manual(values = colorblind_Palette) 
-pp2 <- qplot(x = PC1, y = PC3, data = Plasma_Proteins_Jan, colour = Subject) +
-            scale_colour_manual(values = colorblind_Palette) 
-pp3 <- qplot(x = PC1, y = PC2, data = Plasma_Proteins_Jan, colour = Subject) +
-            scale_colour_manual(values = colorblind_Palette)
-grid.arrange(pp1, pp2, pp3, ncol = 3,
-             top = "Principal Components for Plasma Proteins(Visit 1)")
-dev.off()
-
-Plasma_Metabolites_Jan <- 
-  read.csv(paste("chronobiome/Seth_PCA/PC_Scores/ScoresJan17/",
-                 "PlasmaMetabolites_BothVisits_ScoresFor5PCs.csv"))
-colnames(Plasma_Metabolites_Jan) <- c("Visit", "Subject", "Hour", "PC1",
-                                      "PC2", "PC3", "PC4", "PC5")
-postscript("Plasma_Metabs_PCA_Jan.eps")
-pm1 <- qplot(x = PC2, y = PC3, data = Plasma_Metabolites_Jan, colour = Subject) +
-            scale_colour_manual(values = colorblind_Palette)
-pm2 <- qplot(x = PC1, y = PC3, data = Plasma_Metabolites_Jan, colour = Subject) +
-            scale_colour_manual(values = colorblind_Palette) 
-pm3 <- qplot(x = PC1, y = PC2, data = Plasma_Metabolites_Jan, colour = Subject) +
-            scale_colour_manual(values = colorblind_Palette)
-grid.arrange(pm1, pm2, pm3, ncol = 3, top = paste("Principal Components for ",
-                                              "Plasma Metabolites(Visits", 
-                                              " 1 and 2)")
-             )
-dev.off()
-
-
+##############
+# Scatterplots 
+##############
 # Use Full.with.energy to save scatterplots of every combination of variables
 # within the 48 hour window (406 plots)
 
@@ -832,8 +757,8 @@ sequence <- seq(1, dim(combos)[1])
 chunks <- split(sequence, ceiling(seq_along(sequence) / 4))
 
 pdf("scatterplots.pdf")
-for(chunk in chunks){
-  if(length(chunk) == 4){
+for(chunk in chunks) {
+  if(length(chunk) == 4) {
     pair1 <- combos[chunk[1], ]
     pair2 <- combos[chunk[2], ]
     pair3 <- combos[chunk[3], ]
@@ -851,7 +776,7 @@ for(chunk in chunks){
     plot4 <- qplot(x = Full.with.energy.reduced[pair4[1]],
                    y = Full.with.energy.reduced[pair4[2]],
                    data = Full.with.energy.reduced, xlab = pair4[1], ylab = pair4[2])
-    grid.arrange(plot1, plot2, plot3,plot4, ncol = 2, nrow = 2)
+    grid.arrange(plot1, plot2, plot3, plot4, ncol = 2, nrow = 2)
 
   } else {
     plot1 <- qplot(x = Full.with.energy.reduced[pair1[1]],
