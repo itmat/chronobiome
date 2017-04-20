@@ -201,7 +201,8 @@ PlotR2s(Full.with.energy[, 6:dim(Full.with.energy)[2] - 1],
 dev.off()
 
 # All four months by subject (no blood pressure/heart rate/ ActCom data)
-transformed.communication.activity["Subject"] <- (apply(transformed.communication.activity, 1, ParseSubject, 2))
+transformed.communication.activity["Subject"] <- 
+  apply(transformed.communication.activity, 1, ParseSubject, 2)
 
 # Subject HCR001 
 HCR001.4months <- subset(transformed.communication.activity, Subject == "HCR001")
