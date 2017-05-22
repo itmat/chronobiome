@@ -470,6 +470,9 @@ sequence <- seq(1, dim(combos)[1])
 # each page 
 chunks <- split(sequence, ceiling(seq_along(sequence) / 4))
 
+colorblind_Palette <- c("#000000", "#0072B2", "#56B4E9", "#F0E442",
+                        "#D55E00", "#CC79A7")
+
 pdf("scatterplots.pdf")
 for (chunk in chunks) {
   if (length(chunk) == 4) {
