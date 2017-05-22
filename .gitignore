@@ -31,3 +31,6 @@ vignettes/*.pdf
 # Temporary files created by R markdown
 *.utf8.md
 *.knit.md
+
+# Data directory with links to match hard-coded paths in the scripts
+Carsten_GingerIO/
