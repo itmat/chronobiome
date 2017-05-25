@@ -81,35 +81,111 @@ PlotR2s <- function(chrono_df, title, Sequence) {
   # that activraphy, actigraphy circadian, 
   # communication, communication circadian, and biometric variables are
   # grouped together in the output chart
-  sequence.actcomBP <- c(8, 9, 10, 7, 21, 26, 25, 24, 5, 19, 18, 17, 1,
-                        2, 3, 6, 20, 22, 13, 16, 15, 14, 23, 4, 11, 27, 12)
-  sequence.actcom <- c(7, 8, 9 , 6, 18, 22, 21, 20, 4, 16, 15, 14, 1,
-                       2, 3, 5, 17, 19, 10, 13, 12, 11)
-  sequence.energy <- c(8, 9, 10, 7, 23, 28, 27, 26, 5, 21, 20, 18, 1, 2, 3,
-                      6, 22, 19, 17, 24, 13, 16, 15, 14, 25, 4, 11, 29, 12)
-  sequence.4monthenergy <- c(7, 8, 9, 6, 20, 24, 23, 22, 4, 18, 17, 15, 1, 2,
-                            3, 5, 19, 16, 14, 21, 10, 13, 12, 11)
+  # sequence.actcomBP <- c(8, 9, 10, 7, 21, 26, 25, 24, 5, 19, 18, 17, 1,
+  #                       2, 3, 6, 20, 22, 13, 16, 15, 14, 23, 4, 11, 27, 12)
+  # sequence.actcom <- c(7, 8, 9 , 6, 18, 22, 21, 20, 4, 16, 15, 14, 1,
+  #                      2, 3, 5, 17, 19, 10, 13, 12, 11)
+  # sequence.energy <- c(8, 9, 10, 7, 23, 28, 27, 26, 5, 21, 20, 18, 1, 2, 3,
+  #                     6, 22, 19, 17, 24, 13, 16, 15, 14, 25, 4, 11, 29, 12)
+  # sequence.4monthenergy <- c(7, 8, 9, 6, 20, 24, 23, 22, 4, 18, 17, 15, 1, 2,
+  #                           3, 5, 19, 16, 14, 21, 10, 13, 12, 11)
+  
+  # if (Sequence == "ActCom"){
+  #     f1 <- factor(plot.matrix$factor.1,
+  #                  levels(plot.matrix$factor.1)[sequence.actcom])
+  #     f2 <- factor(plot.matrix$factor.2,
+  #                  levels(plot.matrix$factor.2)[sequence.actcom])           
+  # } else if (Sequence == "BP") {
+  #     f1 <- factor(plot.matrix$factor.1,
+  #                  levels(plot.matrix$factor.1)[sequence.actcomBP])
+  #     f2 <- factor(plot.matrix$factor.2,
+  #                  levels(plot.matrix$factor.2)[sequence.actcomBP])
+  # } else if (Sequence == "energy") {
+  #     f1 <- factor(plot.matrix$factor.1,
+  #                  levels(plot.matrix$factor.1)[sequence.energy])
+  #     f2 <- factor(plot.matrix$factor.2,
+  #                  levels(plot.matrix$factor.2)[sequence.energy])
+  # } else {
+  #     f1 <- factor(plot.matrix$factor.1,
+  #                  levels(plot.matrix$factor.1)[sequence.4monthenergy])
+  #     f2 <- factor(plot.matrix$factor.2,
+  #                  levels(plot.matrix$factor.2)[sequence.4monthenergy]) 
+  # }
+  
+  # Or alternatively, order the variables by explicitly using the names of each
+  # factor level, rather than the number corresponding to its alphabetical order.
+  # The factor levels are still hard-coded, but this makes it a little easier
+  # to incorporate new values.
+  sequence.actcomBP <- c("Communication.amplitude", "Communication.period",
+                         "Communication.phase", "circadian.signal.com",
+                         "log.signal.com", "sqrt.Interaction.Diversity",
+                         "SMS.Length", "SMS.Count", "Call.Count",
+                         "MobilityRadius.amplitude", "MobilityRadius.period",
+                         "MobilityRadius.phase", "circadian.signal.mobR",
+                         "log.Mobility.Radius", "Mobility.amplitude", "Mobility.period",
+                         "Mobility.phase", "circadian.signal.mob", "log.Mobility",
+                         "Lux.amplitude", "Lux.period", "Lux.phase", "circadian.signal.lux",
+                         "log.Luminosity", "activity.amplitude", "activity.period",
+                         "activity.phase", "circadian.signal.act", "log.signal.act",
+                         "log.Steps", "log.activity.Vector.Magnitude", "log.Axis3",
+                         "log.Axis2", "log.Axis1", "pulse.pressure", "arterial.pressure",
+                         "diastolic.bp", "systolic.bp", "heart.rate")
+  sequence.actcom <- c("Communication.amplitude", "Communication.period",
+                       "Communication.phase", "circadian.signal.com",
+                       "log.signal.com", "sqrt.Interaction.Diversity",
+                       "SMS.Length", "SMS.Count", "Call.Count",
+                       "MobilityRadius.amplitude", "MobilityRadius.period",
+                       "MobilityRadius.phase", "circadian.signal.mobR",
+                       "log.Mobility.Radius", "Mobility.amplitude", "Mobility.period",
+                       "Mobility.phase", "circadian.signal.mob", "log.Mobility",
+                       "Lux.amplitude", "Lux.period", "Lux.phase", "circadian.signal.lux",
+                       "log.Luminosity", "activity.amplitude", "activity.period",
+                       "activity.phase", "circadian.signal.act", "log.signal.act",
+                       "log.Steps", "log.activity.Vector.Magnitude", "log.Axis3",
+                       "log.Axis2", "log.Axis1")
+  sequence.energy  <- c("Communication.amplitude", "Communication.period",
+                        "Communication.phase", "circadian.signal.com",
+                        "log.signal.com", "sqrt.Interaction.Diversity",
+                        "SMS.Length", "SMS.Count", "Call.Count",
+                        "MobilityRadius.amplitude", "MobilityRadius.period",
+                        "MobilityRadius.phase", "circadian.signal.mobR",
+                        "log.Mobility.Radius", "Mobility.amplitude", "Mobility.period",
+                        "Mobility.phase", "circadian.signal.mob", "log.Mobility",
+                        "Lux.amplitude", "Lux.period", "Lux.phase", "circadian.signal.lux",
+                        "log.Luminosity", "activity.amplitude", "activity.period",
+                        "activity.phase", "circadian.signal.act", "log.signal.act",
+                        "log.MET.rate", "log.kcals", "log.Steps",
+                        "log.activity.Vector.Magnitude", "log.Axis3", "log.Axis2",
+                        "log.Axis1", "pulse.pressure", "arterial.pressure",
+                        "diastolic.bp", "systolic.bp", "heart.rate")
+  sequence.4monthenergy <- c("Communication.amplitude", "Communication.period",
+                             "Communication.phase", "circadian.signal.com",
+                             "log.signal.com", "sqrt.Interaction.Diversity",
+                             "SMS.Length", "SMS.Count", "Call.Count",
+                             "MobilityRadius.amplitude", "MobilityRadius.period",
+                             "MobilityRadius.phase", "circadian.signal.mobR",
+                             "log.Mobility.Radius", "Mobility.amplitude", "Mobility.period",
+                             "Mobility.phase", "circadian.signal.mob", "log.Mobility",
+                             "Lux.amplitude", "Lux.period", "Lux.phase", "circadian.signal.lux",
+                             "log.Luminosity", "activity.amplitude", "activity.period",
+                             "activity.phase", "circadian.signal.act", "log.signal.act",
+                             "log.MET.rate", "log.kcals", "log.Steps",
+                             "log.activity.Vector.Magnitude", "log.Axis3", "log.Axis2",
+                             "log.Axis1")
+  
 
   if (Sequence == "ActCom"){
-    f1 <- factor(plot.matrix$factor.1,
-                levels(plot.matrix$factor.1)[sequence.actcom])
-    f2 <- factor(plot.matrix$factor.2,
-                levels(plot.matrix$factor.2)[sequence.actcom])           
+    f1 <- factor(plot.matrix$factor.1, sequence.actcom)
+    f2 <- factor(plot.matrix$factor.2, sequence.actcom)
   } else if (Sequence == "BP") {
-    f1 <- factor(plot.matrix$factor.1,
-                 levels(plot.matrix$factor.1)[sequence.actcomBP])
-    f2 <- factor(plot.matrix$factor.2,
-                 levels(plot.matrix$factor.2)[sequence.actcomBP])
+    f1 <- factor(plot.matrix$factor.1, sequence.actcomBP)
+    f2 <- factor(plot.matrix$factor.2, sequence.actcomBP)
   } else if (Sequence == "energy") {
-    f1 <- factor(plot.matrix$factor.1,
-                 levels(plot.matrix$factor.1)[sequence.energy])
-    f2 <- factor(plot.matrix$factor.2,
-                 levels(plot.matrix$factor.2)[sequence.energy])
+    f1 <- factor(plot.matrix$factor.1, sequence.energy)
+    f2 <- factor(plot.matrix$factor.2, sequence.energy)
   } else {
-    f1 <- factor(plot.matrix$factor.1,
-                 levels(plot.matrix$factor.1)[sequence.4monthenergy])
-    f2 <- factor(plot.matrix$factor.2,
-                 levels(plot.matrix$factor.2)[sequence.4monthenergy]) 
+    f1 <- factor(plot.matrix$factor.1, sequence.4monthenergy)
+    f2 <- factor(plot.matrix$factor.2, sequence.4monthenergy)
   }
   # generate geom_tile plot
   plot <-
@@ -117,7 +193,8 @@ PlotR2s <- function(chrono_df, title, Sequence) {
            aes(x = f1, y = f2, fill = variability.explained)) +
            geom_tile(color = "black") +
            scale_fill_gradient(low = "white", high = "steelblue4") +
-           theme(axis.text.x = element_text(angle = 90, size = 8),
+           theme(axis.text.x = element_text(angle = 90, size = 8,
+                                            hjust = 1, vjust = 0.5),
            axis.text.y = element_text(size = 8)) + ggtitle(title) +
            xlab("Factor 1") + ylab("Factor 2")
 
@@ -155,6 +232,7 @@ transformed.communication.activity["X1"] <- NULL
 
 # Two 48 Hour visits containing measurements of blood pressure, heart rate
 BP_HR <- readr::read_csv("heartrate.bp.csv")
+BP_HR["X1"] <- NULL
 act.com.bp.hr.vars4months <- dplyr::full_join(BP_HR, transformed.communication.activity, 
                                               by = "TimeSubjectIndex")
 bp.HR.com.act <- na.omit(act.com.bp.hr.vars4months)
@@ -194,10 +272,11 @@ Full.with.energy <- na.omit(Full.with.energy)
 
 postscript("Variance_Explained_WithEnergy.eps")
 # Plot R^2s excluding Times variable
-PlotR2s(Full.with.energy[, 6:dim(Full.with.energy)[2] - 1],
+PlotR2s(Full.with.energy[, 6:dim(Full.with.energy)[2] - 2],
         paste0("Variance Explained in Activity, Communication, Blood Pressure,",
               " and Energy Variables"),
-        "4monthenergy")
+        # "4monthenergy") #I think this should be "energy" instead of "4monthenergy"
+        "energy")         #since Full.with.energy includes the BP stats.
 dev.off()
 
 # All four months by subject (no blood pressure/heart rate/ ActCom data)
@@ -318,21 +397,21 @@ Full.with.energy["Subject"] <- (apply(Full.with.energy, 1, ParseSubject, 2))
 # Subject HCR001 
 HCR001.set <- subset(Full.with.energy, Subject == "HCR001")
 postscript("HCR001_Variance_BothVisits.eps",  width = 480, height = 480)
-PlotR2s(HCR001.set[, 6:dim(HCR001.set)[2] - 1], "Variance Explained in HCR001",
+PlotR2s(HCR001.set[, 6:dim(HCR001.set)[2] - 2], "Variance Explained in HCR001",
         "energy")
 dev.off()
 
 # HCR003
 HCR003.set <- subset(Full.with.energy, Subject == "HCR003")
 postscript("HCR003_Variance_BothVisits.eps",  width = 480, height = 480)
-PlotR2s(HCR003.set[, 6:dim(HCR003.set)[2] - 1], "Variance Explained in HCR003",
+PlotR2s(HCR003.set[, 6:dim(HCR003.set)[2] - 2], "Variance Explained in HCR003",
         "energy")
 dev.off()
 
 # HCR004
 HCR004.set <- subset(Full.with.energy, Subject == "HCR004")
 postscript("HCR004_Variance_BothVisits.eps",  width = 480, height = 480)
-PlotR2s(HCR004.set[, 6:dim(HCR004.set)[2] - 1], "Variance Explained in HCR004",
+PlotR2s(HCR004.set[, 6:dim(HCR004.set)[2] - 2], "Variance Explained in HCR004",
         "energy")
 dev.off()
 
@@ -340,21 +419,21 @@ dev.off()
 HCR006.set <- subset(Full.with.energy, Subject == "HCR006")
 HCR006.set["Subject"] <- NULL
 postscript("HCR006_Variance_BothVisits.eps",  width = 480, height = 480)
-PlotR2s(HCR006.set[, 6:dim(HCR006.set)[2] - 1], "Variance Explained in HCR006",
+PlotR2s(HCR006.set[, 6:dim(HCR006.set)[2] - 2], "Variance Explained in HCR006",
         "energy")
 dev.off()
   
 # HCR008
 HCR008.set <- subset(Full.with.energy, Subject == "HCR008")
 postscript("HCR008_Variance_BothVisits.eps",  width = 480, height = 480)
-PlotR2s(HCR008.set[, 6:dim(HCR008.set)[2] - 1], "Variance Explained in HCR008",
+PlotR2s(HCR008.set[, 6:dim(HCR008.set)[2] - 2], "Variance Explained in HCR008",
         "energy")
 dev.off()
 
 # HCR009
 HCR009.set <- subset(Full.with.energy, Subject == "HCR009")
 postscript("HCR009_Variance_BothVisits.eps",  width = 480, height = 480)
-PlotR2s(HCR009.set[, 5:(dim(HCR009.set)[2] - 1)], "Variance Explained in HCR009",
+PlotR2s(HCR009.set[, 6:dim(HCR009.set)[2] - 2], "Variance Explained in HCR009",
         "energy")
 dev.off()
 
@@ -364,42 +443,42 @@ dev.off()
 # Subject HCR001 
 HCR001.set1 <- subset(subset(Full.with.energy, Subject == "HCR001"), Days <= 43)
 postscript("HCR001_Variance_visit1.eps",  width = 480, height = 480)
-PlotR2s(HCR001.set1[, 5:(dim(HCR001.set1)[2] - 1)],
+PlotR2s(HCR001.set1[, 6:dim(HCR001.set1)[2] - 2],
         "Variance Explained in HCR001 (visit 1)", "energy")
 dev.off()
 
 # HCR003
 HCR003.set1 <- subset(subset(Full.with.energy, Subject == "HCR003"), (Days <= 43))
 postscript("HCR003_Variance_visit1.eps",  width = 480, height = 480)
-PlotR2s(HCR003.set1[, 5:(dim(HCR003.set1)[2] - 1)],
+PlotR2s(HCR003.set1[, 6:dim(HCR003.set1)[2] - 2],
         "Variance Explained in HCR003 (visit 1)", "energy")
 dev.off()
 
 # HCR004
 HCR004.set1 <- subset(subset(Full.with.energy, Subject == "HCR004"), (Days<=45))
 postscript("HCR004_Variance_visit1.eps",  width = 480, height = 480)
-PlotR2s(HCR004.set1[, 5:(dim(HCR004.set1)[2] - 1)],
+PlotR2s(HCR004.set1[, 6:dim(HCR004.set1)[2] - 2],
         "Variance Explained in HCR004 (visit 1)", "energy")
 dev.off()
 
 # HCR006
 HCR006.set1 <- subset(subset(Full.with.energy, Subject == "HCR006"), (Days<=44))
 postscript("HCR006_Variance_visit1.eps",  width = 480, height = 480)
-PlotR2s(HCR006.set1[, 5:(dim(HCR006.set1)[2] - 1)],
+PlotR2s(HCR006.set1[, 6:dim(HCR006.set1)[2] - 2],
         "Variance Explained in HCR006 (visit 1)", "energy")
 dev.off()
 
 # HCR008
 HCR008.set1 <- subset(subset(Full.with.energy, Subject == "HCR008"), Days<=45)
 postscript("HCR008_Variance_visit1.eps",  width = 480, height = 480)
-PlotR2s(HCR008.set1[, 5:(dim(HCR008.set1)[2] - 1)],
+PlotR2s(HCR008.set1[, 6:dim(HCR008.set1)[2] - 2],
         "Variance Explained in HCR008 (visit 1)", "energy")
 dev.off()
 
 # HCR009
 HCR009.set1 <- subset(subset(Full.with.energy, Subject == "HCR009"), Days <= 51)
 postscript("HCR009_Variance_visit1.eps",  width = 480, height = 480)
-PlotR2s(HCR009.set1[, 5:(dim(HCR009.set1)[2] - 1)],
+PlotR2s(HCR009.set1[, 6:dim(HCR009.set1)[2] - 2],
         "Variance Explained in HCR009 (visit 1)", "energy")
 dev.off()
 
@@ -408,28 +487,28 @@ dev.off()
 # Subject HCR001 
 HCR001.set2 <- subset(subset(Full.with.energy, Subject == "HCR001"), Days>=55)
 postscript("HCR001_Variance_visit2.eps",  width = 480, height = 480)
-PlotR2s(HCR001.set2[, 5:(dim(HCR001.set2)[2] - 1)],
+PlotR2s(HCR001.set2[, 6:dim(HCR001.set2)[2] - 2],
         "Variance Explained in HCR001 (visit 2)", "energy")
 dev.off()
 
 # HCR003
 HCR003.set2 <- subset(subset(Full.with.energy, Subject == "HCR003"), Days >= 55)
 postscript("HCR003_Variance_visit2.eps",  width = 480, height = 480)
-PlotR2s(HCR003.set2[, 5:(dim(HCR003.set2)[2] - 1)],
+PlotR2s(HCR003.set2[, 6:dim(HCR003.set2)[2] - 2],
         "Variance Explained in HCR003 (visit 2)", "energy")
 dev.off()
 
 # HCR004
 HCR004.set2 <- subset(subset(Full.with.energy, Subject == "HCR004"), Days >= 55)
 postscript("HCR004_Variance_visit2.eps",  width = 480, height = 480)
-PlotR2s(HCR004.set2[, 5:(dim(HCR004.set2)[2] - 1)],
+PlotR2s(HCR004.set2[, 6:dim(HCR004.set2)[2] - 2],
         "Variance Explained in HCR004 (visit 2)", "energy")
 dev.off()
 
 # HCR006
 HCR006.set2 <- subset(subset(Full.with.energy, Subject == "HCR006"), Days >= 57)
 postscript("HCR006_Variance_visit2.eps",  width = 480, height = 480)
-PlotR2s(HCR006.set2[, 5:(dim(HCR006.set2)[2] - 1)],
+PlotR2s(HCR006.set2[, 6:dim(HCR006.set2)[2] - 2],
         "Variance Explained in HCR006 (visit 2)", "energy")
 dev.off()
 
@@ -441,7 +520,7 @@ HCR008.set2 <- subset(subset(Full.with.energy, Subject == "HCR008"), Days >= 55)
 # HCR009
 HCR009.set2 <- subset(subset(Full.with.energy, Subject == "HCR009"), Days >= 62)
 postscript("HCR009_Variance_visit2.eps",  width = 480, height = 480)
-PlotR2s(HCR009.set2[, 5:(dim(HCR009.set2)[2] - 1)],
+PlotR2s(HCR009.set2[, 6:dim(HCR009.set2)[2] - 2],
         "Variance Explained in HCR009 (visit 2)", "energy")
 dev.off()
 
@@ -454,7 +533,7 @@ dev.off()
 # Save subject info
 subj <- Full.with.energy["Subject"]
 Full.with.energy.reduced <- subset(Full.with.energy,
-                                   select = -c(X1, Days, Times.y,
+                                   select = -c(Days, Times.y,
                                                TimeSubjectIndex, Times.x, Subject))
 
 # Get a list of all 29-choose-2 combinations of two variables
