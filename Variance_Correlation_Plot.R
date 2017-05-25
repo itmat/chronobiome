@@ -47,7 +47,7 @@ GetR2 <- function(var1, var2) {
 }
   
 
-PlotR2s <- function(chrono_df, title, Sequence) {
+PlotR2s <- function(chrono_df, title, Sequence, triangle_heatmap=FALSE) {
   # Generates geom_tile plot of the % variance explained (R2) for each variable
   # by each other variable.
   # Also outputs matrix of R-squared values in .csv format with the same 
@@ -68,6 +68,11 @@ PlotR2s <- function(chrono_df, title, Sequence) {
   #                    sequence.energy (for datasets including activity,
   #                                     communication, blood pressure,
   #                                     and energy data)
+  # :param: triangle_heatmap - boolean indicating whether to plot just the
+  #                            top of the heatmap, above the diagonal. The
+  #                            heatmap is mirrored across the diagonal, so
+  #                            plotting the full heatmap technically contains
+  #                            redundant information.
   #                                     
   chrono_df["Subject"] <- NULL
   chrono_df["TimeSubjectIndex"] <- NULL            
@@ -85,6 +90,7 @@ PlotR2s <- function(chrono_df, title, Sequence) {
   colnames(plot.matrix) <- c("factor.1", "factor.2", "variability.explained")
   plot.matrix$variability.explained <-
     as.numeric(as.character(plot.matrix$variability.explained))
+  
   # Order variables using their alphabetically-determined level indices such 
   # that activraphy, actigraphy circadian, 
   # communication, communication circadian, and biometric variables are
@@ -195,15 +201,40 @@ PlotR2s <- function(chrono_df, title, Sequence) {
     f1 <- factor(plot.matrix$factor.1, sequence.4monthenergy)
     f2 <- factor(plot.matrix$factor.2, sequence.4monthenergy)
   }
+  
+  #Update factors with new ordering
+  plot.matrix$factor.1 = f1
+  plot.matrix$factor.2 = f2
+  
+  if(triangle_heatmap) {
+      #Remove data from lower triangle
+      plot.matrix <- dcast(plot.matrix, formula = factor.1 ~ factor.2, value.var = "variability.explained")
+      #Exclude factor.1 labels when determining triangle plot
+      factor1 = plot.matrix$factor.1
+      plot.matrix$factor.1 <- NULL
+      plot.matrix[lower.tri(plot.matrix)] <- NA
+      plot.matrix$factor.1 = factor1
+      plot.matrix <- melt(plot.matrix,  variable.name = "factor.2",
+                          value.name = "variability.explained",
+                          id.vars = c("factor.1"))
+      plot.matrix = na.omit(plot.matrix)
+  }
+  
   # generate geom_tile plot
   plot <-
     ggplot(data = plot.matrix,
-           aes(x = f1, y = f2, fill = variability.explained)) +
+           aes(x = factor.1, y = factor.2, fill = variability.explained)) +
            geom_tile(color = "black") +
            scale_fill_gradient(low = "white", high = "steelblue4") +
+           facet_wrap(~factor.1, scales="free_x", ncol = 38) + 
            theme(axis.text.x = element_text(angle = 90, size = 8,
                                             hjust = 1, vjust = 0.5),
-           axis.text.y = element_text(size = 8)) + ggtitle(title) +
+                 axis.text.y = element_text(size = 8),
+                 panel.background = element_blank(),
+                 panel.spacing.x = unit(0, "lines"), 
+                 strip.background = element_blank(),
+                 strip.text = element_blank()) +
+           ggtitle(title) +
            xlab("Factor 1") + ylab("Factor 2")
 
   return(plot)
