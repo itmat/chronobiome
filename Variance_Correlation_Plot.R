@@ -12,6 +12,14 @@
 # Load Packages
 ###############
 
+# Read date of snapshot to use
+args = commandArgs(TRUE)
+checkpoint_date = args[1]
+
+# Use checkpoint created by install script
+library("checkpoint")
+checkpoint(snapshotDate=checkpoint_date, checkpointLocation='.')
+
 library("ggplot2")
 library("Hmisc")
 library("reshape2")

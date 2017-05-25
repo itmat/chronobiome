@@ -24,6 +24,44 @@ PlotPCA <- function(PCdata, title, filename) {
   dev.off()
 }
 
+ParseSubject <- function(row, half) {
+    # Function to be applied to all rows of 
+    # the dataframe in question
+    # :param: row - the entire row of the dataframe
+    # :param: half - indicates whether the "subject" information
+    # is in the first or second half of the string
+    timesubjectindex <- row["TimeSubjectIndex"]
+    strlist <- (strsplit(toString(timesubjectindex), "_"))
+    
+    if (toString(half) == "2") {
+        return(unlist(strlist)[2])
+    } else {
+        return(as.numeric(unlist(strlist)[1]))
+    }
+}
+
+TimeList_window1 <- c(seq(922, 1232))
+TimeList_window2 <- c(seq(1328, 1545))
+
+TimeList <- c(TimeList_window1, TimeList_window2)
+
+
+###############
+# Load Packages
+###############
+
+# Read date of snapshot to use
+args = commandArgs(TRUE)
+checkpoint_date = args[1]
+
+# Use checkpoint created by install script
+library("checkpoint")
+checkpoint(snapshotDate=checkpoint_date, checkpointLocation='.')
+
+library("ggplot2")
+library("gridExtra")
+
+
 ################################
 # Communication and activity PCA
 ################################
@@ -61,8 +99,8 @@ windowed_ActCom_PCA <-
 #purposes.
 
 act.com.PCA.no_circ_stats <- prcomp(dplyr::select(Matrix_For_PCA,
-                                                  -starts_with("Lux"),
-                                                  -starts_with("MobilityRadius"),
+                                                  -dplyr::starts_with("Lux"),
+                                                  -dplyr::starts_with("MobilityRadius"),
                                                   -c(Mobility.amplitude, Mobility.period,
                                                      Mobility.phase, circadian.signal.mob,
                                                      circadian.signal.mobR, circadian.signal.lux)),
