@@ -365,7 +365,7 @@ dev.off()
 
 #HCR003
 HCR004.4months <- subset(Energy.4months, Subject == "HCR004")
-postscript("HCR004_Variance.4months_withEnergy_withEnergy.eps",
+postscript("HCR004_Variance.4months_withEnergy.eps",
            width = 480, height = 480)
 PlotR2s(HCR004.4months, "Variance Explained in HCR004 (all 4 months)",
         "4monthenergy")

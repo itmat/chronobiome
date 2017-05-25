@@ -1,5 +1,7 @@
 #! /bin/bash
 
+#Usage: path/to/chronobiome.sh "path/to/chronobiome/directory"
+
 #Read scripts directory specified by user (if given)
 SCRIPTS_DIR="$1"
 if [ $# -eq 0 ]; then
