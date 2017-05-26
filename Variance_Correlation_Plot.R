@@ -47,7 +47,7 @@ GetR2 <- function(var1, var2) {
 }
   
 
-PlotR2s <- function(chrono_df, title, Sequence, triangle_heatmap=FALSE) {
+PlotR2s <- function(chrono_df, title, Sequence, triangle_heatmap=FALSE, add_labels=FALSE) {
   # Generates geom_tile plot of the % variance explained (R2) for each variable
   # by each other variable.
   # Also outputs matrix of R-squared values in .csv format with the same 
@@ -73,6 +73,9 @@ PlotR2s <- function(chrono_df, title, Sequence, triangle_heatmap=FALSE) {
   #                            heatmap is mirrored across the diagonal, so
   #                            plotting the full heatmap technically contains
   #                            redundant information.
+  # :param: add_labels - boolean indicating whether to add text labels to each
+  #                      box in the heatmap that list the R-squared values. The
+  #                      listed values are rounded to two decimal places.
   #                                     
   chrono_df["Subject"] <- NULL
   chrono_df["TimeSubjectIndex"] <- NULL            
@@ -226,16 +229,21 @@ PlotR2s <- function(chrono_df, title, Sequence, triangle_heatmap=FALSE) {
            aes(x = factor.1, y = factor.2, fill = variability.explained)) +
            geom_tile(color = "black") +
            scale_fill_gradient(low = "white", high = "steelblue4") +
-           facet_wrap(~factor.1, scales="free_x", ncol = 38) + 
+           #facet_wrap(~factor.1, scales="free_x", ncol = 38) + 
            theme(axis.text.x = element_text(angle = 90, size = 8,
                                             hjust = 1, vjust = 0.5),
                  axis.text.y = element_text(size = 8),
-                 panel.background = element_blank(),
-                 panel.spacing.x = unit(0, "lines"), 
-                 strip.background = element_blank(),
-                 strip.text = element_blank()) +
+                 # panel.spacing.x = unit(0, "lines"), 
+                 # strip.background = element_blank(),
+                 # strip.text = element_blank(),
+                 panel.background = element_blank()) +
            ggtitle(title) +
            xlab("Factor 1") + ylab("Factor 2")
+  
+  if(add_labels) {
+      plot <- plot + geom_text(aes(label=sprintf("%0.2f", round(variability.explained, digits = 2))),
+                               size = 1.75)
+  }
 
   return(plot)
 }
@@ -278,7 +286,8 @@ bp.HR.com.act <- na.omit(act.com.bp.hr.vars4months)
 postscript("Variability.Act.Com.BP.eps")
 PlotR2s(bp.HR.com.act[,5:dim(bp.HR.com.act)[2]], 
         paste0("Variance Explained in Activity,", 
-              "Communication, Biometric Data (Visits 1 and 2)"), "BP")
+              "Communication, Biometric Data (Visits 1 and 2)"), "BP",
+        triangle_heatmap = FALSE, add_labels = FALSE)
 dev.off()
 
 # 48 hour visit 1
