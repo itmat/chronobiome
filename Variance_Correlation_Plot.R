@@ -35,32 +35,54 @@ library("gridExtra")
 ##################
 
 
-GetR2 <- function(var1, var2) {
+GetR2 <- function(var1, var2, return_pvalue=FALSE) {
   # Generates a simple linear regression model of var1~var2, and returns
   # R-squared for that model to represent proportion of V1 explained by V2
   # :param: var1 - Variable to 'be explained' by var2
   # :param: var2 - Variable to 'explain' var1
+  # :param: return_pvalue - boolean indicating whether or not function returns
+  #                         p-value for the fit of the estimated linear model
+  #                         to the data, instead of the R-squared value:
+  #                         FALSE (default) - return R-sqaured value.
+  #                         TRUE - return p-value from fit.
   Var1name <- colnames(var1)[1]
   Var2name <-  colnames(var2)[1]
   model <- lm(as.numeric(var1) ~ as.numeric(var2))
-  return(c(Var1name, Var2name, (summary(model)$r.squared)))
-}
   
+  ret_value = summary(model)$r.squared
+  
+  if(return_pvalue) {
+      #Calculate the p-value using F-statistic attributes from linear model
+      fstats <- summary(model)$fstatistic
+      
+      ret_value <- NA
+      
+      #If an f-test was performed successfully
+      if(!is.null(fstats)) {
+          pvalue <- pf(fstats[1],fstats[2],fstats[3],lower.tail=F)
+          attributes(pvalue) <- NULL
+          ret_value <- pvalue
+      }
+      
+  }
+  
+  return(c(Var1name, Var2name, ret_value))
+}
 
-PlotR2s <- function(chrono_df, title, Sequence, triangle_heatmap=FALSE, add_labels=FALSE) {
+
+PlotR2s <- function(chrono_df, title, Sequence, triangle_heatmap=FALSE, add_labels=FALSE, color_by_pvalue=FALSE) {
   # Generates geom_tile plot of the % variance explained (R2) for each variable
   # by each other variable.
-  # Also outputs matrix of R-squared values in .csv format with the same 
-  # :param: chrono_df - Dataframe to plot, including all variables(activity, 
+  # :param: chrono_df - Dataframe to plot, including all variables(activity,
   #                     communication, and in certain time frames,
-  #                     blood pressure) to be compared in this geom_tile plot 
-  #                     note: each variable in the dataframe will be compared 
+  #                     blood pressure) to be compared in this geom_tile plot
+  #                     note: each variable in the dataframe will be compared
   #                     to each other variable in the dataframe (and itself);
-  #                     because these will be compared using R-squared values 
-  #                     yielded from simple linear regression models, they 
-  #                     must be numeric 
-  # :param: title - title to display on plot 
-  # :param: Sequence - string indicating which order of ints to use to plot 
+  #                     because these will be compared using R-squared values
+  #                     yielded from simple linear regression models, they
+  #                     must be numeric
+  # :param: title - title to display on plot
+  # :param: Sequence - string indicating which order of ints to use to plot
   #                    variables on the variance explained output plot:
   #                    sequence.actcom (just activity/communication variables)
   #                    sequence.actcomBP (activity & communication
@@ -74,9 +96,18 @@ PlotR2s <- function(chrono_df, title, Sequence, triangle_heatmap=FALSE, add_labe
   #                            plotting the full heatmap technically contains
   #                            redundant information.
   # :param: add_labels - boolean indicating whether to add text labels to each
-  #                      box in the heatmap that list the R-squared values. The
-  #                      listed values are rounded to two decimal places.
-  #                                     
+  #                      box in the heatmap that list the R-squared values.
+  #                      The listed values are rounded to two decimal places.
+  # :param: color_by_pvalue - boolean indicating whether to color the heatmap
+  #                           using p-values from the fit of the lm model,
+  #                           instead of the R-squared values:
+  #                           FALSE (default) - Color and label plot using
+  #                                             R-squared values.
+  #                           TRUE - Color and label plot using p-values.
+  #                           Note, this parameter also causes the graph to
+  #                           display p-values instead of R-squared values
+  #                           when add_labels is set to TRUE.
+    
   chrono_df["Subject"] <- NULL
   chrono_df["TimeSubjectIndex"] <- NULL            
   r2Matrix <- c()
@@ -85,7 +116,8 @@ PlotR2s <- function(chrono_df, title, Sequence, triangle_heatmap=FALSE, add_labe
       r2Matrix <-
         rbind(r2Matrix,
               GetR2(as.matrix(chrono_df[a]),
-                    as.matrix(chrono_df[b])
+                    as.matrix(chrono_df[b]),
+                    color_by_pvalue
               ))
     }
   }
@@ -227,18 +259,27 @@ PlotR2s <- function(chrono_df, title, Sequence, triangle_heatmap=FALSE, add_labe
   plot <-
     ggplot(data = plot.matrix,
            aes(x = factor.1, y = factor.2, fill = variability.explained)) +
-           geom_tile(color = "black") +
-           scale_fill_gradient(low = "white", high = "steelblue4") +
-           #facet_wrap(~factor.1, scales="free_x", ncol = 38) + 
-           theme(axis.text.x = element_text(angle = 90, size = 8,
-                                            hjust = 1, vjust = 0.5),
-                 axis.text.y = element_text(size = 8),
-                 # panel.spacing.x = unit(0, "lines"), 
-                 # strip.background = element_blank(),
-                 # strip.text = element_blank(),
-                 panel.background = element_blank()) +
-           ggtitle(title) +
-           xlab("Factor 1") + ylab("Factor 2")
+           geom_tile(color = "black")
+  
+  # Adjust color scale for displaying either R-squared values or p-values.
+  if(color_by_pvalue) { #Color by p-values
+      plot <- plot + scale_fill_gradientn(name="p-value",
+                                          colors = c("steelblue4","white"),
+                                          values = c(0,1))
+  } else { #Color by R-squared
+      plot <- plot + scale_fill_gradientn(name="variability\nexplained",
+                                          colors = c("white", "steelblue4"),
+                                          values = c(0,1))
+  }
+  
+  plot <-
+      plot +
+      theme(axis.text.x = element_text(angle = 90, size = 8,
+                                       hjust = 1, vjust = 0.5),
+            axis.text.y = element_text(size = 8),
+            panel.background = element_blank()) +
+      ggtitle(title) +
+      xlab("Factor 1") + ylab("Factor 2")
   
   if(add_labels) {
       plot <- plot + geom_text(aes(label=sprintf("%0.2f", round(variability.explained, digits = 2))),
@@ -295,7 +336,7 @@ Visit1_bp.HR.com.act <- subset(bp.HR.com.act, Times %in% TimeList_window1)
 
 postscript("Varability.Act.Com.BP.Visit1.Feb.eps")
 PlotR2s(Visit1_bp.HR.com.act[, 5:dim(Visit1_bp.HR.com.act)[2]],
-        " Variance Explained in Activity, Communication, Biometric Data(Visit 1)",
+        "Variance Explained in Activity, Communication, Biometric Data(Visit 1)",
         "BP")
 dev.off()
 
@@ -305,6 +346,7 @@ postscript("Varability.Act.Com.BP.Visit2.Feb.eps")
 PlotR2s(Visit2_bp.HR.com.act[, 5:dim(Visit2_bp.HR.com.act)[2]],
         "Variance Explained in Activity, Communication, Biometric Data (Visit 2)", "BP")
 dev.off()
+
 
 energy <- read.csv("energy.csv")
 energy["X"] <- NULL
@@ -326,6 +368,7 @@ PlotR2s(Full.with.energy[, 6:dim(Full.with.energy)[2] - 2],
         # "4monthenergy") #I think this should be "energy" instead of "4monthenergy"
         "energy")         #since Full.with.energy includes the BP stats.
 dev.off()
+
 
 # All four months by subject (no blood pressure/heart rate/ ActCom data)
 transformed.communication.activity["Subject"] <- 
@@ -627,6 +670,128 @@ PlotR2s(HCR009.set2[, 6:dim(HCR009.set2)[2] - 2],
         "Variance Explained in HCR009 (visit 2)", "energy",
         triangle_heatmap = TRUE, add_labels = TRUE)
 dev.off()
+
+
+
+# Heatmaps of LM-fit p-values
+#############################
+
+# Two 48 Hour visits containing measurements of blood pressure, heart rate
+postscript("LM_pvalues.Act.Com.BP.eps")
+PlotR2s(bp.HR.com.act[,5:dim(bp.HR.com.act)[2]], 
+        paste0("Model fit p-values for Activity,", 
+               "Communication, Biometric Data (Visits 1 and 2)"), "BP",
+        triangle_heatmap = FALSE, add_labels = FALSE, color_by_pvalue = TRUE)
+dev.off()
+
+# 48 hour visit 1
+postscript("LM_pvalues.Act.Com.BP.Visit1.Feb.eps")
+PlotR2s(Visit1_bp.HR.com.act[, 5:dim(Visit1_bp.HR.com.act)[2]],
+        "Model fit p-values for Activity, Communication, Biometric Data(Visit 1)",
+        "BP", color_by_pvalue = TRUE)
+dev.off()
+
+# 48 hour visit 2
+postscript("LM_pvalues.Act.Com.BP.Visit2.Feb.eps")
+PlotR2s(Visit2_bp.HR.com.act[, 5:dim(Visit2_bp.HR.com.act)[2]],
+        "Model fit p-values for Activity, Communication, Biometric Data (Visit 2)",
+        "BP", color_by_pvalue = TRUE)
+dev.off()
+
+# Two 48 Hour visits containing measurements of blood pressure, heart rate, and energy expenditure
+postscript("LM_pvalues_WithEnergy.eps")
+PlotR2s(Full.with.energy[, 6:dim(Full.with.energy)[2] - 2],
+        paste0("Model fit p-values for Activity, Communication, Blood Pressure,",
+               " and Energy Variables"),
+        "energy", color_by_pvalue = TRUE)
+dev.off()
+
+# All four months (no blood pressure/heart rate data)
+postscript("LM_pvalues.Activity.Communication.eps",  width = 480, height = 480)
+PlotR2s(transformed.communication.activity,
+        "Model fit p-values for Activity and Communication Data", "ActCom",
+        color_by_pvalue = TRUE)
+dev.off()
+
+# All four months (with energy)
+postscript("LM_pvalues.Activity.Communication_WithEnergy.eps",
+           width = 480, height = 480)
+PlotR2s(Energy.4months,
+        "Model fit p-values for Activity and Communication Data (4 months)",
+        "4monthenergy", color_by_pvalue = TRUE)
+dev.off()
+
+
+# All four months by subject (no blood pressure/heart rate data)
+for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
+    subject.4months <- subset(transformed.communication.activity, Subject == subject)
+    postscript(paste0(subject, "_LM_pvalues.4months.eps"),  width = 480, height = 480)
+    figure_plot = 
+        PlotR2s(subject.4months, paste0("Model fit p-values for ", subject, " (all 4 months)"),
+                "ActCom", color_by_pvalue = TRUE)
+    print(figure_plot)
+    dev.off()
+}
+
+# All four months by subject (with energy)
+for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
+    subject.4months <- subset(Energy.4months, Subject == subject)
+    postscript(paste0(subject, "_LM_pvalues.4months_withEnergy.eps"),  width = 480, height = 480)
+    figure_plot = 
+        PlotR2s(subject.4months, paste0("Model fit p-values for ", subject, " (all 4 months)"),
+                "4monthenergy", color_by_pvalue = TRUE)
+    print(figure_plot)
+    dev.off()
+}
+
+# Both Visits by Subject all variables 
+for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
+    subject.set <- subset(Full.with.energy, Subject == subject)
+    postscript(paste0(subject, "_LM_pvalues_BothVisits.eps"),  width = 480, height = 480)
+    figure_plot = 
+        PlotR2s(subject.set[, 6:dim(subject.set)[2] - 2],
+                paste0("Model fit p-values for ", subject),
+                "energy", color_by_pvalue = TRUE)
+    print(figure_plot)
+    dev.off()
+}
+
+
+#Map Subject ID to Days cutoffs for Visit 1 and Visit 2
+subject_to_session.by_Days =
+    data.frame(Subject = c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009"),
+               Visit1 = c(43, 43, 45, 44, 45, 51),
+               Visit2 = c(55, 55, 55, 57, 55, 62))
+
+# Visit 1 by Subject all variables
+for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
+    subject.set <- subset(subset(Full.with.energy, Subject == subject),
+                          Days <= subset(subject_to_session.by_Days, Subject == subject)$Visit1)
+    postscript(paste0(subject, "_LM_pvalues_visit1.eps"),  width = 480, height = 480)
+    figure_plot = 
+        PlotR2s(subject.set[, 6:dim(subject.set)[2] - 2],
+                paste0("Model fit p-values for ", subject, " (visit 1)"), "energy",
+                color_by_pvalue = TRUE)
+    print(figure_plot)
+    dev.off()
+}
+
+# Visit 2 by Subject all variables
+#Note: Skip HCR008 because it's missing a lot of data from this visit
+for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR009")) {
+    subject.set <- subset(subset(Full.with.energy, Subject == subject),
+                          Days >= subset(subject_to_session.by_Days, Subject == subject)$Visit2)
+    postscript(paste0(subject, "_LM_pvalues_visit2.eps"),  width = 480, height = 480)
+    figure_plot = 
+        PlotR2s(subject.set[, 6:dim(subject.set)[2] - 2],
+                paste0("Model fit p-values for ", subject, " (visit 2)"), "energy",
+                color_by_pvalue = TRUE)
+    print(figure_plot)
+    dev.off()
+}
+
+
+
 
 ##############
 # Scatterplots 
