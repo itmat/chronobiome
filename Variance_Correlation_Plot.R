@@ -494,12 +494,23 @@ postscript("HCR001_Variance_visit1.eps",  width = 480, height = 480)
 PlotR2s(HCR001.set1[, 6:dim(HCR001.set1)[2] - 2],
         "Variance Explained in HCR001 (visit 1)", "energy")
 dev.off()
+postscript("HCR001_Variance_visit1.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR001.set1[, 6:dim(HCR001.set1)[2] - 2],
+        "Variance Explained in HCR001 (visit 1)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
+
 
 # HCR003
 HCR003.set1 <- subset(subset(Full.with.energy, Subject == "HCR003"), (Days <= 43))
 postscript("HCR003_Variance_visit1.eps",  width = 480, height = 480)
 PlotR2s(HCR003.set1[, 6:dim(HCR003.set1)[2] - 2],
         "Variance Explained in HCR003 (visit 1)", "energy")
+dev.off()
+postscript("HCR003_Variance_visit1.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR003.set1[, 6:dim(HCR003.set1)[2] - 2],
+        "Variance Explained in HCR003 (visit 1)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
 dev.off()
 
 # HCR004
@@ -508,12 +519,22 @@ postscript("HCR004_Variance_visit1.eps",  width = 480, height = 480)
 PlotR2s(HCR004.set1[, 6:dim(HCR004.set1)[2] - 2],
         "Variance Explained in HCR004 (visit 1)", "energy")
 dev.off()
+postscript("HCR004_Variance_visit1.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR004.set1[, 6:dim(HCR004.set1)[2] - 2],
+        "Variance Explained in HCR004 (visit 1)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
 
 # HCR006
 HCR006.set1 <- subset(subset(Full.with.energy, Subject == "HCR006"), (Days<=44))
 postscript("HCR006_Variance_visit1.eps",  width = 480, height = 480)
 PlotR2s(HCR006.set1[, 6:dim(HCR006.set1)[2] - 2],
         "Variance Explained in HCR006 (visit 1)", "energy")
+dev.off()
+postscript("HCR006_Variance_visit1.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR006.set1[, 6:dim(HCR006.set1)[2] - 2],
+        "Variance Explained in HCR006 (visit 1)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
 dev.off()
 
 # HCR008
@@ -522,12 +543,22 @@ postscript("HCR008_Variance_visit1.eps",  width = 480, height = 480)
 PlotR2s(HCR008.set1[, 6:dim(HCR008.set1)[2] - 2],
         "Variance Explained in HCR008 (visit 1)", "energy")
 dev.off()
+postscript("HCR008_Variance_visit1.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR008.set1[, 6:dim(HCR008.set1)[2] - 2],
+        "Variance Explained in HCR008 (visit 1)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
 
 # HCR009
 HCR009.set1 <- subset(subset(Full.with.energy, Subject == "HCR009"), Days <= 51)
 postscript("HCR009_Variance_visit1.eps",  width = 480, height = 480)
 PlotR2s(HCR009.set1[, 6:dim(HCR009.set1)[2] - 2],
         "Variance Explained in HCR009 (visit 1)", "energy")
+dev.off()
+postscript("HCR009_Variance_visit1.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR009.set1[, 6:dim(HCR009.set1)[2] - 2],
+        "Variance Explained in HCR009 (visit 1)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
 dev.off()
 
 
@@ -538,12 +569,22 @@ postscript("HCR001_Variance_visit2.eps",  width = 480, height = 480)
 PlotR2s(HCR001.set2[, 6:dim(HCR001.set2)[2] - 2],
         "Variance Explained in HCR001 (visit 2)", "energy")
 dev.off()
+postscript("HCR001_Variance_visit2.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR001.set2[, 6:dim(HCR001.set2)[2] - 2],
+        "Variance Explained in HCR001 (visit 2)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
 
 # HCR003
 HCR003.set2 <- subset(subset(Full.with.energy, Subject == "HCR003"), Days >= 55)
 postscript("HCR003_Variance_visit2.eps",  width = 480, height = 480)
 PlotR2s(HCR003.set2[, 6:dim(HCR003.set2)[2] - 2],
         "Variance Explained in HCR003 (visit 2)", "energy")
+dev.off()
+postscript("HCR003_Variance_visit2.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR003.set2[, 6:dim(HCR003.set2)[2] - 2],
+        "Variance Explained in HCR003 (visit 2)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
 dev.off()
 
 # HCR004
@@ -552,12 +593,22 @@ postscript("HCR004_Variance_visit2.eps",  width = 480, height = 480)
 PlotR2s(HCR004.set2[, 6:dim(HCR004.set2)[2] - 2],
         "Variance Explained in HCR004 (visit 2)", "energy")
 dev.off()
+postscript("HCR004_Variance_visit2.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR004.set2[, 6:dim(HCR004.set2)[2] - 2],
+        "Variance Explained in HCR004 (visit 2)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
 
 # HCR006
 HCR006.set2 <- subset(subset(Full.with.energy, Subject == "HCR006"), Days >= 57)
 postscript("HCR006_Variance_visit2.eps",  width = 480, height = 480)
 PlotR2s(HCR006.set2[, 6:dim(HCR006.set2)[2] - 2],
         "Variance Explained in HCR006 (visit 2)", "energy")
+dev.off()
+postscript("HCR006_Variance_visit2.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR006.set2[, 6:dim(HCR006.set2)[2] - 2],
+        "Variance Explained in HCR006 (visit 2)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
 dev.off()
 
 # HCR008
@@ -570,6 +621,11 @@ HCR009.set2 <- subset(subset(Full.with.energy, Subject == "HCR009"), Days >= 62)
 postscript("HCR009_Variance_visit2.eps",  width = 480, height = 480)
 PlotR2s(HCR009.set2[, 6:dim(HCR009.set2)[2] - 2],
         "Variance Explained in HCR009 (visit 2)", "energy")
+dev.off()
+postscript("HCR009_Variance_visit2.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR009.set2[, 6:dim(HCR009.set2)[2] - 2],
+        "Variance Explained in HCR009 (visit 2)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
 dev.off()
 
 ##############
