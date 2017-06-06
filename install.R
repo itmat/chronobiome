@@ -21,6 +21,7 @@ checkpoint(snapshotDate=checkpoint_date, checkpointLocation='.')
 
 library("readr")
 library("ggplot2")
+library("ggdendro")
 library("Hmisc")
 library("reshape2")
 library("dplyr")
