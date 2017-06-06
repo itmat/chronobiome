@@ -22,6 +22,8 @@ Repo Contents
     - *energy.csv*
 * **Variance_Correlation_Plot.R**
   - Generates R-squared (variability explained) heatmaps for activity & communication variables for all 4 months and  for activity, communication, and blood pressure / heart rate variables
+  - Generates p-value (from linear model fitting) heatmaps for activity & communication variables for all 4 months and  for activity, communication, and blood pressure / heart rate variables
+  - Clusters subjects and generates dendrograms for p-values (from linear model fitting) across activity & communication variables for all 4 months and  for activity, communication, and blood pressure / heart rate variables
   - Generates .pdf of scatterplots for each activity, communication, energy, and blood pressure/heartrate variable against each other 
   - Outputs:
     - *Variability.Act.Com.BP.eps*
