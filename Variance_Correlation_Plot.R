@@ -347,16 +347,45 @@ FormatPvalueTableForClustering <- function(pvalue_table) {
 }
 
 
-PlotDendro <- function(pvalue_table, title) {
+PlotDendro <- function(pvalue_table, title, subset=NULL) {
     # Plots a dendrogram, given a formatted table of
     # LM-fit p-values. This version of the function
     # uses base R graphics.
     # :param: pvalue_table - Dataframe with the following columns:
     #                        Subject, comparison.label, p_value
     # :param: title - title to display on plot
+    # :param: subset - string indicating if only a subset
+    #                  of the input data should be used for
+    #                  clustering:
+    #                  NULL (default) - use all input data
+    #                  circadian - just use comparisons between
+    #                              the circadian stats (period
+    #                              phase, amplitude,
+    #                              circadina.signal)
+    #                  no_circ - exclude all comparisons
+    #                            using circadian stats.
+    
+    filtered.pvalue_table <- pvalue_table
+    
+    #If user wants to subset the data
+    if(!is.null(subset)) {
+        
+        if(subset == "circadian") {
+            #Retain circadian stats only
+            filtered.pvalue_table <-
+                filtered.pvalue_table %>% 
+                dplyr::filter(grepl("(period|phase|amplitude|circadian).*_.*(period|phase|amplitude|circadian)", comparison.label))
+            
+        } else if(subset == "no_circ") {
+            #Exclude circadian stats
+            filtered.pvalue_table <-
+                filtered.pvalue_table %>% 
+                dplyr::filter(!grepl("(period|phase|amplitude|circadian)", comparison.label))
+        }
+    }
     
     data_for_clustering <- 
-        pvalue_table %>% 
+        filtered.pvalue_table %>% 
         dcast(formula = Subject ~ comparison.label, value.var = "p_value") %>% 
         tibble::column_to_rownames(var="Subject") %>% 
         as.matrix()
@@ -369,7 +398,7 @@ PlotDendro <- function(pvalue_table, title) {
 }
 
 
-PlotDendro.w_ggdendro <- function(pvalue_table, title) {
+PlotDendro.w_ggdendro <- function(pvalue_table, title, subset=NULL) {
     # Generates a dendrogram as a ggplot object, given a
     # formatted table of LM-fit p-values. This function
     # is appropriate if the user needs to pass the plot
@@ -378,9 +407,38 @@ PlotDendro.w_ggdendro <- function(pvalue_table, title) {
     # :param: pvalue_table - Dataframe with the following columns:
     #                        Subject, comparison.label, p_value
     # :param: title - title to display on plot
+    # :param: subset - string indicating if only a subset
+    #                  of the input data should be used for
+    #                  clustering:
+    #                  NULL (default) - use all input data
+    #                  circadian - just use comparisons between
+    #                              the circadian stats (period
+    #                              phase, amplitude,
+    #                              circadina.signal)
+    #                  no_circ - exclude all comparisons
+    #                            using circadian stats.
+    
+    filtered.pvalue_table <- pvalue_table
+    
+    #If user wants to subset the data
+    if(!is.null(subset)) {
+        
+        if(subset == "circadian") {
+            #Retain circadian stats only
+            filtered.pvalue_table <-
+                filtered.pvalue_table %>% 
+                dplyr::filter(grepl("(period|phase|amplitude|circadian).*_.*(period|phase|amplitude|circadian)", comparison.label))
+            
+        } else if(subset == "no_circ") {
+            #Exclude circadian stats
+            filtered.pvalue_table <-
+                filtered.pvalue_table %>% 
+                dplyr::filter(!grepl("(period|phase|amplitude|circadian)", comparison.label))
+        }
+    }
     
     data_for_clustering <- 
-        pvalue_table %>% 
+        filtered.pvalue_table %>% 
         dcast(formula = Subject ~ comparison.label, value.var = "p_value") %>% 
         tibble::column_to_rownames(var="Subject") %>% 
         as.matrix()
@@ -861,6 +919,32 @@ PlotDendro(all_subjects.pvalue_table.4months,
            "Cluster subjects by LM-fit p-value using 4 months of data")
 dev.off()
 
+#Cluster without circadian stats
+postscript("Clustering_dendro.LM_pvalues.Activity_Communication.4months.no_circ_stats.eps",  width = 480, height = 480)
+PlotDendro(all_subjects.pvalue_table.4months,
+           "Cluster subjects by LM-fit p-value using 4 months of data\n(no circadian stats)",
+           "no_circ")
+dev.off()
+
+#Cluster using only circadian stats
+postscript("Clustering_dendro.LM_pvalues.Activity_Communication.4months.circ_stats_only.eps",  width = 480, height = 480)
+PlotDendro(all_subjects.pvalue_table.4months,
+           "Cluster subjects by LM-fit p-value using 4 months of data\n(circadian stats only)",
+           "circadian")
+dev.off()
+
+#Collect graphs into single file
+postscript("Clustering_dendro.LM_pvalues.Activity_Communication.4months.all_subsets.eps",  width = 480, height = 1440)
+PlotDendro(all_subjects.pvalue_table.4months,
+           "Cluster subjects by LM-fit p-value using 4 months of data")
+PlotDendro(all_subjects.pvalue_table.4months,
+           "Cluster subjects by LM-fit p-value using 4 months of data\n(no circadian stats)",
+           "no_circ")
+PlotDendro(all_subjects.pvalue_table.4months,
+           "Cluster subjects by LM-fit p-value using 4 months of data\n(circadian stats only)",
+           "circadian")
+dev.off()
+
 
 # All four months by subject (with energy)
 all_subjects.pvalue_table.4months_w_E = data.frame()
@@ -889,6 +973,32 @@ for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
 postscript("Clustering_dendro.LM_pvalues.WithEnergy.4months.eps",  width = 480, height = 480)
 PlotDendro(all_subjects.pvalue_table.4months_w_E,
            "Cluster subjects by LM-fit p-value using 4 months of data (with energy)")
+dev.off()
+
+#Cluster without circadian stats
+postscript("Clustering_dendro.LM_pvalues.WithEnergy.4months.no_circ_stats.eps",  width = 480, height = 480)
+PlotDendro(all_subjects.pvalue_table.4months_w_E,
+           "Cluster subjects by LM-fit p-value using 4 months of data\n(with energy; no circadian stats)",
+           "no_circ")
+dev.off()
+
+#Cluster using only circadian stats
+postscript("Clustering_dendro.LM_pvalues.WithEnergy.4months.circ_stats_only.eps",  width = 480, height = 480)
+PlotDendro(all_subjects.pvalue_table.4months_w_E,
+           "Cluster subjects by LM-fit p-value using 4 months of data\n(with energy; circadian stats only)",
+           "circadian")
+dev.off()
+
+#Collect graphs into single file
+postscript("Clustering_dendro.LM_pvalues.WithEnergy.4months.all_subsets.eps",  width = 480, height = 1440)
+PlotDendro(all_subjects.pvalue_table.4months_w_E,
+           "Cluster subjects by LM-fit p-value using 4 months of data (with energy)")
+PlotDendro(all_subjects.pvalue_table.4months_w_E,
+           "Cluster subjects by LM-fit p-value using 4 months of data\n(with energy; no circadian stats)",
+           "no_circ")
+PlotDendro(all_subjects.pvalue_table.4months_w_E,
+           "Cluster subjects by LM-fit p-value using 4 months of data\n(with energy; circadian stats only)",
+           "circadian")
 dev.off()
 
 
@@ -920,6 +1030,32 @@ for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
 postscript("Clustering_dendro.LM_pvalues.all_measurements.Both_visits.eps",  width = 480, height = 480)
 PlotDendro(all_subjects.pvalue_table.bothVisits,
            "Cluster subjects by LM-fit p-value using both visits (all measurments)")
+dev.off()
+
+#Cluster without circadian stats
+postscript("Clustering_dendro.LM_pvalues.no_circ_stats.Both_visits.eps",  width = 480, height = 480)
+PlotDendro(all_subjects.pvalue_table.bothVisits,
+           "Cluster subjects by LM-fit p-value using both visits (no circadian stats)",
+           "no_circ")
+dev.off()
+
+#Cluster using only circadian stats
+postscript("Clustering_dendro.LM_pvalues.circ_stats_only.Both_visits.eps",  width = 480, height = 480)
+PlotDendro(all_subjects.pvalue_table.bothVisits,
+           "Cluster subjects by LM-fit p-value using both visits (circadian stats only)",
+           "circadian")
+dev.off()
+
+#Collect graphs into single file
+postscript("Clustering_dendro.LM_pvalues.all_subsets.Both_visits.eps",  width = 480, height = 1440)
+PlotDendro(all_subjects.pvalue_table.bothVisits,
+           "Cluster subjects by LM-fit p-value using both visits (all measurments)")
+PlotDendro(all_subjects.pvalue_table.bothVisits,
+           "Cluster subjects by LM-fit p-value using both visits (no circadian stats)",
+           "no_circ")
+PlotDendro(all_subjects.pvalue_table.bothVisits,
+           "Cluster subjects by LM-fit p-value using both visits (circadian stats only)",
+           "circadian")
 dev.off()
 
 
@@ -960,7 +1096,31 @@ PlotDendro(all_subjects.pvalue_table.visit1,
            "Cluster subjects by LM-fit p-value using Visit 1 (all measurments)")
 dev.off()
 
+#Cluster without circadian stats
+postscript("Clustering_dendro.LM_pvalues.no_circ_stats.Visit1.eps",  width = 480, height = 480)
+PlotDendro(all_subjects.pvalue_table.visit1,
+           "Cluster subjects by LM-fit p-value using Visit 1 (no circadian stats)",
+           "no_circ")
+dev.off()
 
+#Cluster using only circadian stats
+postscript("Clustering_dendro.LM_pvalues.circ_stats_only.Visit1.eps",  width = 480, height = 480)
+PlotDendro(all_subjects.pvalue_table.visit1,
+           "Cluster subjects by LM-fit p-value using Visit 1 (circadian stats only)",
+           "circadian")
+dev.off()
+
+#Collect graphs into single file
+postscript("Clustering_dendro.LM_pvalues.all_subsets.Visit1.eps",  width = 480, height = 1440)
+PlotDendro(all_subjects.pvalue_table.visit1,
+           "Cluster subjects by LM-fit p-value using Visit 1 (all measurments)")
+PlotDendro(all_subjects.pvalue_table.visit1,
+           "Cluster subjects by LM-fit p-value using Visit 1 (no circadian stats)",
+           "no_circ")
+PlotDendro(all_subjects.pvalue_table.visit1,
+           "Cluster subjects by LM-fit p-value using Visit 1 (circadian stats only)",
+           "circadian")
+dev.off()
 
 
 # Visit 2 by Subject all variables
@@ -995,6 +1155,32 @@ PlotDendro(all_subjects.pvalue_table.visit2,
            "Cluster subjects by LM-fit p-value using Visit 2 (all measurments)")
 dev.off()
 
+#Cluster without circadian stats
+postscript("Clustering_dendro.LM_pvalues.no_circ_stats.Visit2.eps",  width = 480, height = 480)
+PlotDendro(all_subjects.pvalue_table.visit2,
+           "Cluster subjects by LM-fit p-value using Visit 2 (no circadian stats)",
+           "no_circ")
+dev.off()
+
+#Cluster using only circadian stats
+postscript("Clustering_dendro.LM_pvalues.circ_stats_only.Visit2.eps",  width = 480, height = 480)
+PlotDendro(all_subjects.pvalue_table.visit2,
+           "Cluster subjects by LM-fit p-value using Visit 2 (circadian stats only)",
+           "circadian")
+dev.off()
+
+#Collect graphs into single file
+postscript("Clustering_dendro.LM_pvalues.all_subsets.Visit2.eps",  width = 480, height = 1440)
+PlotDendro(all_subjects.pvalue_table.visit2,
+           "Cluster subjects by LM-fit p-value using Visit 2 (all measurments)")
+PlotDendro(all_subjects.pvalue_table.visit2,
+           "Cluster subjects by LM-fit p-value using Visit 2 (no circadian stats)",
+           "no_circ")
+PlotDendro(all_subjects.pvalue_table.visit2,
+           "Cluster subjects by LM-fit p-value using Visit 2 (circadian stats only)",
+           "circadian")
+dev.off()
+
 
 #Compare LM-fit p-values for each subject over both visits, visit1, visit2,
 #4 months of data with energy, and 4 months of data without energy. This will
@@ -1021,8 +1207,32 @@ PlotDendro(merged_data_for_clustering,
            "Cluster subjects by LM-fit p-value using all measurement periods")
 dev.off()
 
-PlotDendro.w_ggdendro(merged_data_for_clustering,
-                      "Cluster subjects by LM-fit p-value using all measurement periods")
+#Cluster without circadian stats
+postscript("Clustering_dendro.LM_pvalues.no_circ_stats.all_periods.eps",  width = 480, height = 480)
+PlotDendro(merged_data_for_clustering,
+           "Cluster subjects by LM-fit p-value using all measurement periods\n(no circadian stats)",
+           "no_circ")
+dev.off()
+
+#Cluster using only circadian stats
+postscript("Clustering_dendro.LM_pvalues.circ_stats_only.all_periods.eps",  width = 480, height = 480)
+PlotDendro(merged_data_for_clustering,
+           "Cluster subjects by LM-fit p-value using all measurement periods\n(circadian stats only)",
+           "circadian")
+dev.off()
+
+#Collect graphs into single file
+postscript("Clustering_dendro.LM_pvalues.all_subsets.all_periods.eps",  width = 480, height = 1440)
+PlotDendro(merged_data_for_clustering,
+           "Cluster subjects by LM-fit p-value using all measurement periods")
+PlotDendro(merged_data_for_clustering,
+           "Cluster subjects by LM-fit p-value using all measurement periods\n(no circadian stats)",
+           "no_circ")
+PlotDendro(merged_data_for_clustering,
+           "Cluster subjects by LM-fit p-value using all measurement periods\n(circadian stats only)",
+           "circadian")
+dev.off()
+
 
 
 
