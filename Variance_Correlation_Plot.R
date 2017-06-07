@@ -10,6 +10,11 @@
 # blood pressure/heart rate, and energy
 ################################################
 
+#NOTE ABOUT 4MONTH DATA WITHOUT ENERGY EXPENDITURE:
+#     For these analyses we want to stick with the full dataset, which includes the
+#     energy expenditure data. I'll keep the code processing the 4-month data without
+#     energy expenditure for legacy/reference purposes, but I'm commenting it out.
+
 ###############
 # Load Packages
 ###############
@@ -73,7 +78,8 @@ GetR2 <- function(var1, var2, return_pvalue=FALSE) {
 }
 
 
-PlotR2s <- function(chrono_df, title, Sequence, triangle_heatmap=FALSE, add_labels=FALSE, color_by_pvalue=FALSE) {
+PlotR2s <- function(chrono_df, title, Sequence,
+                    triangle_heatmap=FALSE, add_labels=FALSE, color_by_pvalue=FALSE, apply_bonferroni=FALSE) {
   # Generates geom_tile plot of the % variance explained (R2) for each variable
   # by each other variable.
   # :param: chrono_df - Dataframe to plot, including all variables(activity,
@@ -103,13 +109,29 @@ PlotR2s <- function(chrono_df, title, Sequence, triangle_heatmap=FALSE, add_labe
   #                      The listed values are rounded to two decimal places.
   # :param: color_by_pvalue - boolean indicating whether to color the heatmap
   #                           using p-values from the fit of the lm model,
-  #                           instead of the R-squared values:
+  #                           instead of the R-squared values. The colors are
+  #                           evenly scaled from 0 (dark) and 0.05 (light).
+  #                           All p-values above 0.05 are color white. Note,
+  #                           this parameter also causes the graph to display
+  #                           p-values instead of R-squared values when
+  #                           add_labels is set to TRUE.
   #                           FALSE (default) - Color and label plot using
   #                                             R-squared values.
   #                           TRUE - Color and label plot using p-values.
-  #                           Note, this parameter also causes the graph to
-  #                           display p-values instead of R-squared values
-  #                           when add_labels is set to TRUE.
+  #                           
+  # :param: apply_bonferroni - boolean indicating whether or not to apply
+  #                            a Bonferroni correction to the p-value color
+  #                            scale. Note, this parameter has no effect if
+  #                            color_by_pvalue is set to FALSE.
+  #                            FALSE (default) - p-value colors are scaled
+  #                                              from 0 to 0.05. All other
+  #                                              p-values are colored white.
+  #                            TRUE - p-value colors are scaled from 0 to
+  #                                   0.05 / n, where n is the total number
+  #                                   of non-reciprocal comparisons (e.g.
+  #                                   "SMS.Count x Call.Count" and "Call.Count
+  #                                   x SMS.Count" are reciprocal comparisons)
+  #                                   performed.
     
   chrono_df["Subject"] <- NULL
   chrono_df["TimeSubjectIndex"] <- NULL            
@@ -266,9 +288,28 @@ PlotR2s <- function(chrono_df, title, Sequence, triangle_heatmap=FALSE, add_labe
   
   # Adjust color scale for displaying either R-squared values or p-values.
   if(color_by_pvalue) { #Color by p-values
-      plot <- plot + scale_fill_gradientn(name="p-value",
-                                          colors = c("steelblue4","white","white"),
-                                          values = c(0,0.05,1))
+      
+      if(apply_bonferroni) { #Apply Bonferroni correction to upper-limit of color scale
+          
+          #NOTE: This calculation works when the two factors we're comparing are
+          #      identical. However, if there are elements in one factor not present
+          #      in the other, this cutoff will be higher than the true Bonferroni-
+          #      corrected value. There is room to improve this calculation to
+          #      account for this possibility. However, since we're currently only
+          #      using this code to plot matrices mirrored down the diagonal, this
+          #      will suffice.
+          bf_cutoff = 0.05 / (length(f1) / 2)
+          
+          plot <- plot + scale_fill_gradientn(name="p-value",
+                                              colors = c("darkred","white","white"),
+                                              values = c(0,bf_cutoff,1))
+
+      } else { #Scale colors between 0 and 0.05
+          plot <- plot + scale_fill_gradientn(name="p-value",
+                                              colors = c("darkred","white","white"),
+                                              values = c(0,0.05,1))
+      }
+      
   } else { #Color by R-squared
       plot <- plot + scale_fill_gradientn(name="variability\nexplained",
                                           colors = c("white", "steelblue4"),
@@ -487,7 +528,7 @@ postscript("Variability.Act.Com.BP.eps")
 PlotR2s(bp.HR.com.act[,5:dim(bp.HR.com.act)[2]], 
         paste0("Variance Explained in Activity,", 
               "Communication, Biometric Data (Visits 1 and 2)"), "BP",
-        triangle_heatmap = FALSE, add_labels = FALSE)
+        triangle_heatmap = TRUE)
 dev.off()
 
 
@@ -498,17 +539,18 @@ TimeList_window2 <- c(seq(1328, 1545))
 # 48 hour visit 1
 Visit1_bp.HR.com.act <- subset(bp.HR.com.act, Times %in% TimeList_window1)
 
-postscript("Varability.Act.Com.BP.Visit1.Feb.eps")
+postscript("Variability.Act.Com.BP.Visit1.eps")
 PlotR2s(Visit1_bp.HR.com.act[, 5:dim(Visit1_bp.HR.com.act)[2]],
         "Variance Explained in Activity, Communication, Biometric Data(Visit 1)",
-        "BP")
+        "BP", triangle_heatmap = TRUE)
 dev.off()
 
 # 48 hour visit 2
 Visit2_bp.HR.com.act <- subset(bp.HR.com.act, Times %in% TimeList_window2)
-postscript("Varability.Act.Com.BP.Visit2.Feb.eps")
+postscript("Variability.Act.Com.BP.Visit2.eps")
 PlotR2s(Visit2_bp.HR.com.act[, 5:dim(Visit2_bp.HR.com.act)[2]],
-        "Variance Explained in Activity, Communication, Biometric Data (Visit 2)", "BP")
+        "Variance Explained in Activity, Communication, Biometric Data (Visit 2)", "BP",
+        triangle_heatmap = TRUE)
 dev.off()
 
 
@@ -529,8 +571,7 @@ postscript("Variance_Explained_WithEnergy.eps")
 PlotR2s(Full.with.energy[, 6:dim(Full.with.energy)[2] - 2],
         paste0("Variance Explained in Activity, Communication, Blood Pressure,",
               " and Energy Variables"),
-        # "4monthenergy") #I think this should be "energy" instead of "4monthenergy"
-        "energy")         #since Full.with.energy includes the BP stats.
+        "energy", triangle_heatmap = TRUE)
 dev.off()
 
 
@@ -538,54 +579,55 @@ dev.off()
 transformed.communication.activity["Subject"] <- 
   apply(transformed.communication.activity, 1, ParseSubject, 2)
 
-# Subject HCR001 
-HCR001.4months <- subset(transformed.communication.activity, Subject == "HCR001")
-postscript("HCR001_Variance.4months.eps",  width = 480, height = 480)
-PlotR2s(HCR001.4months, "Variance Explained in HCR001 (all 4 months)",
-        "ActCom")
-dev.off()
-
-# HCR003
-HCR003.4months <- subset(transformed.communication.activity, Subject == "HCR003")
-postscript("HCR003_Variance.4months.eps",  width = 480, height = 480)
-PlotR2s(HCR003.4months, "Variance Explained in HCR003 (all 4 months)",
-        "ActCom")
-dev.off()
-
-# HCR004
-HCR004.4months <- subset(transformed.communication.activity, Subject == "HCR004") 
-postscript("HCR004_Variance.4months.eps",  width = 480, height = 480)
-PlotR2s(HCR004.4months, "Variance Explained in HCR004 (all 4 months)",
-        "ActCom")
-dev.off()
-
-# HCR006
-HCR006.4months <- subset(transformed.communication.activity, Subject == "HCR006")
-postscript("HCR006_Variance.4months.eps",  width = 480, height = 480)
-PlotR2s(HCR006.4months, "Variance Explained in HCR006 (all 4 months)",
-        "ActCom")
-dev.off()
-
-# HCR008
-HCR008.4months <- subset(transformed.communication.activity, Subject == "HCR008")
-postscript("HCR008_Variance.4months.eps",  width = 480, height = 480)
-PlotR2s(HCR008.4months, "Variance Explained in HCR008 (all 4 months)",
-        "ActCom")
-dev.off()
-
-# HCR009
-HCR009.4months <- subset(transformed.communication.activity, Subject == "HCR009")
-postscript("HCR009_Variance.4months.eps",  width = 480, height = 480)
-PlotR2s(HCR009.4months, "Variance Explained in HCR009 (all 4 months)",
-        "ActCom")
-dev.off()
-
-
-# All four months (no blood pressure/heart rate data)
-postscript("Variability.Activity.Communication.eps",  width = 480, height = 480)
-PlotR2s(transformed.communication.activity,
-        "Variance Explained in Activity and Communication Data", "ActCom")
-dev.off()
+# # Subject HCR001 
+# HCR001.4months <- subset(transformed.communication.activity, Subject == "HCR001")
+# postscript("HCR001_Variance.4months.eps",  width = 480, height = 480)
+# PlotR2s(HCR001.4months, "Variance Explained in HCR001 (all 4 months)",
+#         "ActCom", triangle_heatmap = TRUE)
+# dev.off()
+# 
+# # HCR003
+# HCR003.4months <- subset(transformed.communication.activity, Subject == "HCR003")
+# postscript("HCR003_Variance.4months.eps",  width = 480, height = 480)
+# PlotR2s(HCR003.4months, "Variance Explained in HCR003 (all 4 months)",
+#         "ActCom", triangle_heatmap = TRUE)
+# dev.off()
+# 
+# # HCR004
+# HCR004.4months <- subset(transformed.communication.activity, Subject == "HCR004") 
+# postscript("HCR004_Variance.4months.eps",  width = 480, height = 480)
+# PlotR2s(HCR004.4months, "Variance Explained in HCR004 (all 4 months)",
+#         "ActCom", triangle_heatmap = TRUE)
+# dev.off()
+# 
+# # HCR006
+# HCR006.4months <- subset(transformed.communication.activity, Subject == "HCR006")
+# postscript("HCR006_Variance.4months.eps",  width = 480, height = 480)
+# PlotR2s(HCR006.4months, "Variance Explained in HCR006 (all 4 months)",
+#         "ActCom", triangle_heatmap = TRUE)
+# dev.off()
+# 
+# # HCR008
+# HCR008.4months <- subset(transformed.communication.activity, Subject == "HCR008")
+# postscript("HCR008_Variance.4months.eps",  width = 480, height = 480)
+# PlotR2s(HCR008.4months, "Variance Explained in HCR008 (all 4 months)",
+#         "ActCom", triangle_heatmap = TRUE)
+# dev.off()
+# 
+# # HCR009
+# HCR009.4months <- subset(transformed.communication.activity, Subject == "HCR009")
+# postscript("HCR009_Variance.4months.eps",  width = 480, height = 480)
+# PlotR2s(HCR009.4months, "Variance Explained in HCR009 (all 4 months)",
+#         "ActCom", triangle_heatmap = TRUE)
+# dev.off()
+# 
+# 
+# # All four months (no blood pressure/heart rate data)
+# postscript("Variability.Activity.Communication.eps",  width = 480, height = 480)
+# PlotR2s(transformed.communication.activity,
+#         "Variance Explained in Activity and Communication Data", "ActCom",
+#         triangle_heatmap = TRUE)
+# dev.off()
 
 
 ######################################
@@ -599,7 +641,7 @@ HCR001.4months <- subset(Energy.4months, Subject == "HCR001")
 postscript("HCR001_Variance.4months_withEnergy.eps",
            width = 480, height = 480)
 PlotR2s(HCR001.4months, "Variance Explained in HCR001 (all 4 months)",
-        "4monthenergy")
+        "4monthenergy", triangle_heatmap = TRUE)
 dev.off()
 
 # HCR003
@@ -607,7 +649,7 @@ HCR003.4months <- subset(Energy.4months, Subject == "HCR003")
 postscript("HCR003_Variance.4months_withEnergy.eps",
            width = 480, height = 480)
 PlotR2s(HCR003.4months, "Variance Explained in HCR003 (all 4 months)",
-        "4monthenergy")
+        "4monthenergy", triangle_heatmap = TRUE)
 dev.off()
 
 #HCR003
@@ -615,35 +657,35 @@ HCR004.4months <- subset(Energy.4months, Subject == "HCR004")
 postscript("HCR004_Variance.4months_withEnergy.eps",
            width = 480, height = 480)
 PlotR2s(HCR004.4months, "Variance Explained in HCR004 (all 4 months)",
-        "4monthenergy")
+        "4monthenergy", triangle_heatmap = TRUE)
 dev.off()
 
 # HCR006
 HCR006.4months <- subset(Energy.4months, Subject == "HCR006")
 postscript("HCR006_Variance.4months_withEnergy.eps", width = 480, height = 480)
 PlotR2s(HCR006.4months, "Variance Explained in HCR006 (all 4 months)",
-        "4monthenergy")
+        "4monthenergy", triangle_heatmap = TRUE)
 dev.off()
 
 # HCR008
 HCR008.4months <- subset(Energy.4months, Subject == "HCR008")
 postscript("HCR008_Variance.4months_withEnergy.eps", width = 480, height = 480)
 PlotR2s(HCR008.4months, "Variance Explained in HCR008 (all 4 months)",
-        "4monthenergy")
+        "4monthenergy", triangle_heatmap = TRUE)
 dev.off()
 
 # HCR009
 HCR009.4months <- subset(Energy.4months, Subject == "HCR009")
 postscript("HCR009_Variance.4months_withEnergy.eps", width = 480, height = 480)
 PlotR2s(HCR009.4months, "Variance Explained in HCR009 (all 4 months)",
-        "4monthenergy")
+        "4monthenergy", triangle_heatmap = TRUE)
 dev.off()
 
 postscript("Variability.Activity.Communication_WithEnergy.eps",
            width = 480, height = 480)
 PlotR2s(Energy.4months,
         "Variance Explained in Activity and Communication Data (4 months)",
-        "4monthenergy")
+        "4monthenergy", triangle_heatmap = TRUE)
 dev.off()
 
 # Both Visits by Subject all variables 
@@ -653,21 +695,21 @@ Full.with.energy["Subject"] <- (apply(Full.with.energy, 1, ParseSubject, 2))
 HCR001.set <- subset(Full.with.energy, Subject == "HCR001")
 postscript("HCR001_Variance_BothVisits.eps",  width = 480, height = 480)
 PlotR2s(HCR001.set[, 6:dim(HCR001.set)[2] - 2], "Variance Explained in HCR001",
-        "energy")
+        "energy", triangle_heatmap = TRUE)
 dev.off()
 
 # HCR003
 HCR003.set <- subset(Full.with.energy, Subject == "HCR003")
 postscript("HCR003_Variance_BothVisits.eps",  width = 480, height = 480)
 PlotR2s(HCR003.set[, 6:dim(HCR003.set)[2] - 2], "Variance Explained in HCR003",
-        "energy")
+        "energy", triangle_heatmap = TRUE)
 dev.off()
 
 # HCR004
 HCR004.set <- subset(Full.with.energy, Subject == "HCR004")
 postscript("HCR004_Variance_BothVisits.eps",  width = 480, height = 480)
 PlotR2s(HCR004.set[, 6:dim(HCR004.set)[2] - 2], "Variance Explained in HCR004",
-        "energy")
+        "energy", triangle_heatmap = TRUE)
 dev.off()
 
 # HCR006
@@ -675,21 +717,21 @@ HCR006.set <- subset(Full.with.energy, Subject == "HCR006")
 HCR006.set["Subject"] <- NULL
 postscript("HCR006_Variance_BothVisits.eps",  width = 480, height = 480)
 PlotR2s(HCR006.set[, 6:dim(HCR006.set)[2] - 2], "Variance Explained in HCR006",
-        "energy")
+        "energy", triangle_heatmap = TRUE)
 dev.off()
   
 # HCR008
 HCR008.set <- subset(Full.with.energy, Subject == "HCR008")
 postscript("HCR008_Variance_BothVisits.eps",  width = 480, height = 480)
 PlotR2s(HCR008.set[, 6:dim(HCR008.set)[2] - 2], "Variance Explained in HCR008",
-        "energy")
+        "energy", triangle_heatmap = TRUE)
 dev.off()
 
 # HCR009
 HCR009.set <- subset(Full.with.energy, Subject == "HCR009")
 postscript("HCR009_Variance_BothVisits.eps",  width = 480, height = 480)
 PlotR2s(HCR009.set[, 6:dim(HCR009.set)[2] - 2], "Variance Explained in HCR009",
-        "energy")
+        "energy", triangle_heatmap = TRUE)
 dev.off()
 
 
@@ -699,7 +741,8 @@ dev.off()
 HCR001.set1 <- subset(subset(Full.with.energy, Subject == "HCR001"), Days <= 43)
 postscript("HCR001_Variance_visit1.eps",  width = 480, height = 480)
 PlotR2s(HCR001.set1[, 6:dim(HCR001.set1)[2] - 2],
-        "Variance Explained in HCR001 (visit 1)", "energy")
+        "Variance Explained in HCR001 (visit 1)", "energy",
+        triangle_heatmap = TRUE)
 dev.off()
 postscript("HCR001_Variance_visit1.with_labels.eps",  width = 480, height = 480)
 PlotR2s(HCR001.set1[, 6:dim(HCR001.set1)[2] - 2],
@@ -712,7 +755,8 @@ dev.off()
 HCR003.set1 <- subset(subset(Full.with.energy, Subject == "HCR003"), (Days <= 43))
 postscript("HCR003_Variance_visit1.eps",  width = 480, height = 480)
 PlotR2s(HCR003.set1[, 6:dim(HCR003.set1)[2] - 2],
-        "Variance Explained in HCR003 (visit 1)", "energy")
+        "Variance Explained in HCR003 (visit 1)", "energy",
+        triangle_heatmap = TRUE)
 dev.off()
 postscript("HCR003_Variance_visit1.with_labels.eps",  width = 480, height = 480)
 PlotR2s(HCR003.set1[, 6:dim(HCR003.set1)[2] - 2],
@@ -724,7 +768,8 @@ dev.off()
 HCR004.set1 <- subset(subset(Full.with.energy, Subject == "HCR004"), (Days<=45))
 postscript("HCR004_Variance_visit1.eps",  width = 480, height = 480)
 PlotR2s(HCR004.set1[, 6:dim(HCR004.set1)[2] - 2],
-        "Variance Explained in HCR004 (visit 1)", "energy")
+        "Variance Explained in HCR004 (visit 1)", "energy",
+        triangle_heatmap = TRUE)
 dev.off()
 postscript("HCR004_Variance_visit1.with_labels.eps",  width = 480, height = 480)
 PlotR2s(HCR004.set1[, 6:dim(HCR004.set1)[2] - 2],
@@ -736,7 +781,8 @@ dev.off()
 HCR006.set1 <- subset(subset(Full.with.energy, Subject == "HCR006"), (Days<=44))
 postscript("HCR006_Variance_visit1.eps",  width = 480, height = 480)
 PlotR2s(HCR006.set1[, 6:dim(HCR006.set1)[2] - 2],
-        "Variance Explained in HCR006 (visit 1)", "energy")
+        "Variance Explained in HCR006 (visit 1)", "energy",
+        triangle_heatmap = TRUE)
 dev.off()
 postscript("HCR006_Variance_visit1.with_labels.eps",  width = 480, height = 480)
 PlotR2s(HCR006.set1[, 6:dim(HCR006.set1)[2] - 2],
@@ -748,7 +794,8 @@ dev.off()
 HCR008.set1 <- subset(subset(Full.with.energy, Subject == "HCR008"), Days<=45)
 postscript("HCR008_Variance_visit1.eps",  width = 480, height = 480)
 PlotR2s(HCR008.set1[, 6:dim(HCR008.set1)[2] - 2],
-        "Variance Explained in HCR008 (visit 1)", "energy")
+        "Variance Explained in HCR008 (visit 1)", "energy",
+        triangle_heatmap = TRUE)
 dev.off()
 postscript("HCR008_Variance_visit1.with_labels.eps",  width = 480, height = 480)
 PlotR2s(HCR008.set1[, 6:dim(HCR008.set1)[2] - 2],
@@ -760,7 +807,8 @@ dev.off()
 HCR009.set1 <- subset(subset(Full.with.energy, Subject == "HCR009"), Days <= 51)
 postscript("HCR009_Variance_visit1.eps",  width = 480, height = 480)
 PlotR2s(HCR009.set1[, 6:dim(HCR009.set1)[2] - 2],
-        "Variance Explained in HCR009 (visit 1)", "energy")
+        "Variance Explained in HCR009 (visit 1)", "energy",
+        triangle_heatmap = TRUE)
 dev.off()
 postscript("HCR009_Variance_visit1.with_labels.eps",  width = 480, height = 480)
 PlotR2s(HCR009.set1[, 6:dim(HCR009.set1)[2] - 2],
@@ -774,7 +822,8 @@ dev.off()
 HCR001.set2 <- subset(subset(Full.with.energy, Subject == "HCR001"), Days>=55)
 postscript("HCR001_Variance_visit2.eps",  width = 480, height = 480)
 PlotR2s(HCR001.set2[, 6:dim(HCR001.set2)[2] - 2],
-        "Variance Explained in HCR001 (visit 2)", "energy")
+        "Variance Explained in HCR001 (visit 2)", "energy",
+        triangle_heatmap = TRUE)
 dev.off()
 postscript("HCR001_Variance_visit2.with_labels.eps",  width = 480, height = 480)
 PlotR2s(HCR001.set2[, 6:dim(HCR001.set2)[2] - 2],
@@ -786,7 +835,8 @@ dev.off()
 HCR003.set2 <- subset(subset(Full.with.energy, Subject == "HCR003"), Days >= 55)
 postscript("HCR003_Variance_visit2.eps",  width = 480, height = 480)
 PlotR2s(HCR003.set2[, 6:dim(HCR003.set2)[2] - 2],
-        "Variance Explained in HCR003 (visit 2)", "energy")
+        "Variance Explained in HCR003 (visit 2)", "energy",
+        triangle_heatmap = TRUE)
 dev.off()
 postscript("HCR003_Variance_visit2.with_labels.eps",  width = 480, height = 480)
 PlotR2s(HCR003.set2[, 6:dim(HCR003.set2)[2] - 2],
@@ -798,7 +848,8 @@ dev.off()
 HCR004.set2 <- subset(subset(Full.with.energy, Subject == "HCR004"), Days >= 55)
 postscript("HCR004_Variance_visit2.eps",  width = 480, height = 480)
 PlotR2s(HCR004.set2[, 6:dim(HCR004.set2)[2] - 2],
-        "Variance Explained in HCR004 (visit 2)", "energy")
+        "Variance Explained in HCR004 (visit 2)", "energy",
+        triangle_heatmap = TRUE)
 dev.off()
 postscript("HCR004_Variance_visit2.with_labels.eps",  width = 480, height = 480)
 PlotR2s(HCR004.set2[, 6:dim(HCR004.set2)[2] - 2],
@@ -810,7 +861,8 @@ dev.off()
 HCR006.set2 <- subset(subset(Full.with.energy, Subject == "HCR006"), Days >= 57)
 postscript("HCR006_Variance_visit2.eps",  width = 480, height = 480)
 PlotR2s(HCR006.set2[, 6:dim(HCR006.set2)[2] - 2],
-        "Variance Explained in HCR006 (visit 2)", "energy")
+        "Variance Explained in HCR006 (visit 2)", "energy",
+        triangle_heatmap = TRUE)
 dev.off()
 postscript("HCR006_Variance_visit2.with_labels.eps",  width = 480, height = 480)
 PlotR2s(HCR006.set2[, 6:dim(HCR006.set2)[2] - 2],
@@ -827,7 +879,8 @@ HCR008.set2 <- subset(subset(Full.with.energy, Subject == "HCR008"), Days >= 55)
 HCR009.set2 <- subset(subset(Full.with.energy, Subject == "HCR009"), Days >= 62)
 postscript("HCR009_Variance_visit2.eps",  width = 480, height = 480)
 PlotR2s(HCR009.set2[, 6:dim(HCR009.set2)[2] - 2],
-        "Variance Explained in HCR009 (visit 2)", "energy")
+        "Variance Explained in HCR009 (visit 2)", "energy",
+        triangle_heatmap = TRUE)
 dev.off()
 postscript("HCR009_Variance_visit2.with_labels.eps",  width = 480, height = 480)
 PlotR2s(HCR009.set2[, 6:dim(HCR009.set2)[2] - 2],
@@ -845,21 +898,21 @@ postscript("LM_pvalues.Act.Com.BP.eps")
 PlotR2s(bp.HR.com.act[,5:dim(bp.HR.com.act)[2]], 
         paste0("Model fit p-values for Activity,", 
                "Communication, Biometric Data (Visits 1 and 2)"), "BP",
-        triangle_heatmap = FALSE, add_labels = FALSE, color_by_pvalue = TRUE)
+        color_by_pvalue = TRUE, apply_bonferroni = TRUE)
 dev.off()
 
 # 48 hour visit 1
 postscript("LM_pvalues.Act.Com.BP.Visit1.Feb.eps")
 PlotR2s(Visit1_bp.HR.com.act[, 5:dim(Visit1_bp.HR.com.act)[2]],
         "Model fit p-values for Activity, Communication, Biometric Data(Visit 1)",
-        "BP", color_by_pvalue = TRUE)
+        "BP", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
 dev.off()
 
 # 48 hour visit 2
 postscript("LM_pvalues.Act.Com.BP.Visit2.Feb.eps")
 PlotR2s(Visit2_bp.HR.com.act[, 5:dim(Visit2_bp.HR.com.act)[2]],
         "Model fit p-values for Activity, Communication, Biometric Data (Visit 2)",
-        "BP", color_by_pvalue = TRUE)
+        "BP", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
 dev.off()
 
 # Two 48 Hour visits containing measurements of blood pressure, heart rate, and energy expenditure
@@ -867,22 +920,22 @@ postscript("LM_pvalues_WithEnergy.eps")
 PlotR2s(Full.with.energy[, 6:dim(Full.with.energy)[2] - 2],
         paste0("Model fit p-values for Activity, Communication, Blood Pressure,",
                " and Energy Variables"),
-        "energy", color_by_pvalue = TRUE)
+        "energy", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
 dev.off()
 
-# All four months (no blood pressure/heart rate data)
-postscript("LM_pvalues.Activity.Communication.eps",  width = 480, height = 480)
-PlotR2s(transformed.communication.activity,
-        "Model fit p-values for Activity and Communication Data", "ActCom",
-        color_by_pvalue = TRUE)
-dev.off()
+# # All four months (no blood pressure/heart rate data)
+# postscript("LM_pvalues.Activity.Communication.eps",  width = 480, height = 480)
+# PlotR2s(transformed.communication.activity,
+#         "Model fit p-values for Activity and Communication Data", "ActCom",
+#         color_by_pvalue = TRUE)
+# dev.off()
 
 # All four months (with energy)
 postscript("LM_pvalues.Activity.Communication_WithEnergy.eps",
            width = 480, height = 480)
 PlotR2s(Energy.4months,
         "Model fit p-values for Activity and Communication Data (4 months)",
-        "4monthenergy", color_by_pvalue = TRUE)
+        "4monthenergy", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
 dev.off()
 
 #A note about clustering. The ggplot2 object returned by the PlotR2s function contains
@@ -890,60 +943,60 @@ dev.off()
 #to extract the table of LM-fit p-values for each subject while generating the heatmaps.
 
 
-# All four months by subject (no blood pressure/heart rate data)
-all_subjects.pvalue_table.4months = data.frame()
-
-for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
-    subject.4months <- subset(transformed.communication.activity, Subject == subject)
-    # postscript(paste0(subject, "_LM_pvalues.4months.eps"),  width = 480, height = 480)
-    figure_plot = 
-        PlotR2s(subject.4months, paste0("Model fit p-values for ", subject, " (all 4 months)"),
-                "ActCom", color_by_pvalue = TRUE)
-    # print(figure_plot)
-    # dev.off()
-    
-    #Extract table of p-values for current subject
-    subject.pvalue_table = figure_plot$data
-    
-    #Format and add to existing table of p-values for all subjects
-    all_subjects.pvalue_table.4months <-
-        FormatPvalueTableForClustering(subject.pvalue_table) %>% 
-        dplyr::mutate(Subject = subject) %>% 
-        dplyr::select(Subject, comparison.label, p_value) %>%
-        dplyr::bind_rows(all_subjects.pvalue_table.4months)
-}
-
-#Cluster data by subjects and plot dendrogram
-postscript("Clustering_dendro.LM_pvalues.Activity_Communication.4months.eps",  width = 480, height = 480)
-PlotDendro(all_subjects.pvalue_table.4months,
-           "Cluster subjects by LM-fit p-value using 4 months of data")
-dev.off()
-
-#Cluster without circadian stats
-postscript("Clustering_dendro.LM_pvalues.Activity_Communication.4months.no_circ_stats.eps",  width = 480, height = 480)
-PlotDendro(all_subjects.pvalue_table.4months,
-           "Cluster subjects by LM-fit p-value using 4 months of data\n(no circadian stats)",
-           "no_circ")
-dev.off()
-
-#Cluster using only circadian stats
-postscript("Clustering_dendro.LM_pvalues.Activity_Communication.4months.circ_stats_only.eps",  width = 480, height = 480)
-PlotDendro(all_subjects.pvalue_table.4months,
-           "Cluster subjects by LM-fit p-value using 4 months of data\n(circadian stats only)",
-           "circadian")
-dev.off()
-
-#Collect graphs into single file
-postscript("Clustering_dendro.LM_pvalues.Activity_Communication.4months.all_subsets.eps",  width = 480, height = 1440)
-PlotDendro(all_subjects.pvalue_table.4months,
-           "Cluster subjects by LM-fit p-value using 4 months of data")
-PlotDendro(all_subjects.pvalue_table.4months,
-           "Cluster subjects by LM-fit p-value using 4 months of data\n(no circadian stats)",
-           "no_circ")
-PlotDendro(all_subjects.pvalue_table.4months,
-           "Cluster subjects by LM-fit p-value using 4 months of data\n(circadian stats only)",
-           "circadian")
-dev.off()
+# # All four months by subject (no blood pressure/heart rate data)
+# all_subjects.pvalue_table.4months = data.frame()
+# 
+# for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
+#     subject.4months <- subset(transformed.communication.activity, Subject == subject)
+#     # postscript(paste0(subject, "_LM_pvalues.4months.eps"),  width = 480, height = 480)
+#     figure_plot = 
+#         PlotR2s(subject.4months, paste0("Model fit p-values for ", subject, " (all 4 months)"),
+#                 "ActCom", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
+#     # print(figure_plot)
+#     # dev.off()
+#     
+#     #Extract table of p-values for current subject
+#     subject.pvalue_table = figure_plot$data
+#     
+#     #Format and add to existing table of p-values for all subjects
+#     all_subjects.pvalue_table.4months <-
+#         FormatPvalueTableForClustering(subject.pvalue_table) %>% 
+#         dplyr::mutate(Subject = subject) %>% 
+#         dplyr::select(Subject, comparison.label, p_value) %>%
+#         dplyr::bind_rows(all_subjects.pvalue_table.4months)
+# }
+# 
+# #Cluster data by subjects and plot dendrogram
+# postscript("Clustering_dendro.LM_pvalues.Activity_Communication.4months.eps",  width = 480, height = 480)
+# PlotDendro(all_subjects.pvalue_table.4months,
+#            "Cluster subjects by LM-fit p-value using 4 months of data")
+# dev.off()
+# 
+# #Cluster without circadian stats
+# postscript("Clustering_dendro.LM_pvalues.Activity_Communication.4months.no_circ_stats.eps",  width = 480, height = 480)
+# PlotDendro(all_subjects.pvalue_table.4months,
+#            "Cluster subjects by LM-fit p-value using 4 months of data\n(no circadian stats)",
+#            "no_circ")
+# dev.off()
+# 
+# #Cluster using only circadian stats
+# postscript("Clustering_dendro.LM_pvalues.Activity_Communication.4months.circ_stats_only.eps",  width = 480, height = 480)
+# PlotDendro(all_subjects.pvalue_table.4months,
+#            "Cluster subjects by LM-fit p-value using 4 months of data\n(circadian stats only)",
+#            "circadian")
+# dev.off()
+# 
+# #Collect graphs into single file
+# postscript("Clustering_dendro.LM_pvalues.Activity_Communication.4months.all_subsets.eps",  width = 480, height = 1440)
+# PlotDendro(all_subjects.pvalue_table.4months,
+#            "Cluster subjects by LM-fit p-value using 4 months of data")
+# PlotDendro(all_subjects.pvalue_table.4months,
+#            "Cluster subjects by LM-fit p-value using 4 months of data\n(no circadian stats)",
+#            "no_circ")
+# PlotDendro(all_subjects.pvalue_table.4months,
+#            "Cluster subjects by LM-fit p-value using 4 months of data\n(circadian stats only)",
+#            "circadian")
+# dev.off()
 
 
 # All four months by subject (with energy)
@@ -951,12 +1004,12 @@ all_subjects.pvalue_table.4months_w_E = data.frame()
 
 for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
     subject.4months <- subset(Energy.4months, Subject == subject)
-    # postscript(paste0(subject, "_LM_pvalues.4months_withEnergy.eps"),  width = 480, height = 480)
+    postscript(paste0(subject, "_LM_pvalues.4months_withEnergy.eps"),  width = 480, height = 480)
     figure_plot = 
         PlotR2s(subject.4months, paste0("Model fit p-values for ", subject, " (all 4 months)"),
-                "4monthenergy", color_by_pvalue = TRUE)
-    # print(figure_plot)
-    # dev.off()
+                "4monthenergy", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
+    print(figure_plot)
+    dev.off()
     
     #Extract table of p-values for current subject
     subject.pvalue_table = figure_plot$data
@@ -972,7 +1025,7 @@ for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
 #Cluster data by subjects and plot dendrogram
 postscript("Clustering_dendro.LM_pvalues.WithEnergy.4months.eps",  width = 480, height = 480)
 PlotDendro(all_subjects.pvalue_table.4months_w_E,
-           "Cluster subjects by LM-fit p-value using 4 months of data (with energy)")
+           "Cluster subjects by LM-fit p-value using 4 months of data")
 dev.off()
 
 #Cluster without circadian stats
@@ -992,12 +1045,12 @@ dev.off()
 #Collect graphs into single file
 postscript("Clustering_dendro.LM_pvalues.WithEnergy.4months.all_subsets.eps",  width = 480, height = 1440)
 PlotDendro(all_subjects.pvalue_table.4months_w_E,
-           "Cluster subjects by LM-fit p-value using 4 months of data (with energy)")
+           "Cluster subjects by LM-fit p-value using 4 months of data")
 PlotDendro(all_subjects.pvalue_table.4months_w_E,
-           "Cluster subjects by LM-fit p-value using 4 months of data\n(with energy; no circadian stats)",
+           "Cluster subjects by LM-fit p-value using 4 months of data\n(no circadian stats)",
            "no_circ")
 PlotDendro(all_subjects.pvalue_table.4months_w_E,
-           "Cluster subjects by LM-fit p-value using 4 months of data\n(with energy; circadian stats only)",
+           "Cluster subjects by LM-fit p-value using 4 months of data\n(circadian stats only)",
            "circadian")
 dev.off()
 
@@ -1007,13 +1060,13 @@ all_subjects.pvalue_table.bothVisits = data.frame()
 
 for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
     subject.set <- subset(Full.with.energy, Subject == subject)
-    # postscript(paste0(subject, "_LM_pvalues_BothVisits.eps"),  width = 480, height = 480)
+    postscript(paste0(subject, "_LM_pvalues_BothVisits.eps"),  width = 480, height = 480)
     figure_plot = 
         PlotR2s(subject.set[, 6:dim(subject.set)[2] - 2],
                 paste0("Model fit p-values for ", subject),
-                "energy", color_by_pvalue = TRUE)
-    # print(figure_plot)
-    # dev.off()
+                "energy", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
+    print(figure_plot)
+    dev.off()
     
     #Extract table of p-values for current subject
     subject.pvalue_table = figure_plot$data
@@ -1071,13 +1124,13 @@ all_subjects.pvalue_table.visit1 = data.frame()
 for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
     subject.set <- subset(subset(Full.with.energy, Subject == subject),
                           Days <= subset(subject_to_session.by_Days, Subject == subject)$Visit1)
-    # postscript(paste0(subject, "_LM_pvalues_visit1.eps"),  width = 480, height = 480)
+    postscript(paste0(subject, "_LM_pvalues_visit1.eps"),  width = 480, height = 480)
     figure_plot = 
         PlotR2s(subject.set[, 6:dim(subject.set)[2] - 2],
                 paste0("Model fit p-values for ", subject, " (visit 1)"), "energy",
-                color_by_pvalue = TRUE)
-    # print(figure_plot)
-    # dev.off()
+                color_by_pvalue = TRUE, apply_bonferroni = TRUE)
+    print(figure_plot)
+    dev.off()
     
     #Extract table of p-values for current subject
     subject.pvalue_table = figure_plot$data
@@ -1130,13 +1183,13 @@ all_subjects.pvalue_table.visit2 = data.frame()
 for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR009")) {
     subject.set <- subset(subset(Full.with.energy, Subject == subject),
                           Days >= subset(subject_to_session.by_Days, Subject == subject)$Visit2)
-    # postscript(paste0(subject, "_LM_pvalues_visit2.eps"),  width = 480, height = 480)
+    postscript(paste0(subject, "_LM_pvalues_visit2.eps"),  width = 480, height = 480)
     figure_plot = 
         PlotR2s(subject.set[, 6:dim(subject.set)[2] - 2],
                 paste0("Model fit p-values for ", subject, " (visit 2)"), "energy",
-                color_by_pvalue = TRUE)
-    # print(figure_plot)
-    # dev.off()
+                color_by_pvalue = TRUE, apply_bonferroni = TRUE)
+    print(figure_plot)
+    dev.off()
     
     #Extract table of p-values for current subject
     subject.pvalue_table = figure_plot$data
@@ -1190,10 +1243,10 @@ dev.off()
 #Merge data from different measurement periods for clustering
 merged_data_for_clustering <-
     dplyr::bind_rows(
-        dplyr::mutate(all_subjects.pvalue_table.4months,
-                      Subject = paste0(Subject, ".4months")),
+        # dplyr::mutate(all_subjects.pvalue_table.4months,
+        #               Subject = paste0(Subject, ".4months_no_E")),
         dplyr::mutate(all_subjects.pvalue_table.4months_w_E,
-                      Subject = paste0(Subject, ".4months_w_E")),
+                      Subject = paste0(Subject, ".4months")),
         dplyr::mutate(all_subjects.pvalue_table.bothVisits,
                       Subject = paste0(Subject, ".bothVisits")),
         dplyr::mutate(all_subjects.pvalue_table.visit1,
