@@ -50,6 +50,10 @@ mobility_radius.circ_stats = read.csv("chronobiome/Carsten_GingerIO/Communicatio
 mobility.circ_stats.NoA = na.omit(mobility.circ_stats)
 mobility_radius.circ_stats.NoA = na.omit(mobility_radius.circ_stats)
 
+# Dietary intake data
+diet <- read.delim("chronobiome/Carsten_GingerIO/Dietary_Data/Binned_dietary_data.fill_missing_timepoints.txt")
+diet <- na.omit(diet)
+
 
 #######################################################
 # Process data, combine activity and communication sets
@@ -80,6 +84,12 @@ bloodpressure.HR$Date <- substr(bloodpressure.HR$Start.Time, 0, 10)
 bloodpressure.HR$Days <- chron(as.character(bloodpressure.HR$Date), 
                                format=c(dates="y-m-d")) - chron("2014-10-21", 
                                                                 format=c(dates="y-m-d"))
+
+diet$Date <- substr(diet$Start.Time, 0, 10)
+diet$Days <- chron(as.character(diet$Date), 
+                      format=c(dates="y-m-d")) - chron("2014-10-21", 
+                                                       format=c(dates="y-m-d"))
+
 
 energy$Days <- chron(as.character(energy$date), format=c(dates="m/d/y")) - chron("2014-10-21", format=c(dates="y-m-d"))
 
@@ -116,6 +126,9 @@ lux.circ_stats$TimeSubjectIndex <-
 bloodpressure.HR$TimeIndex <- bloodpressure.HR$Days * 24 + bloodpressure.HR$Hour
 bloodpressure.HR$TimeSubjectIndex <-
   paste(bloodpressure.HR$TimeIndex, bloodpressure.HR$Subject, sep = "_")
+
+diet$TimeIndex <- diet$Days * 24 + diet$Hour
+diet$TimeSubjectIndex <- paste(diet$TimeIndex, diet$Subject, sep = "_")
 
 energy$TimeIndex <- hours(times(as.character(energy$epoch), format=c(times="h:m:s"))) + energy$Days*24
 energy$TimeSubjectIndex <- paste(energy$TimeIndex, energy$Subject.ID, sep="_")
@@ -171,6 +184,7 @@ Heartrate.BP <- Heartrate.BP[c("TimeSubjectIndex", "Days","Times", "heart.rate",
                                "diastolic.bp","systolic.bp", "arterial.pressure", "pulse.pressure")]
 
 write.csv(Heartrate.BP, "heartrate.bp.csv")
+
 
 # Subset communication dataset to include only TimeSubjectIndex recordings
 # also present in the activity dataset, take average of each variable at 
@@ -305,7 +319,17 @@ energy.df <- energy %>%
                    log.MET.rate = log(mean(MET.rate)+1)
   )
 
+# dietary intake (already summed within each hour)
+diet.df <- 
+    diet %>% 
+    dplyr::select(Subject, TimeIndex, TimeSubjectIndex, Data.type, Signal) %>% 
+    dcast(formula = Subject + TimeIndex + TimeSubjectIndex ~ Data.type, value.var = "Signal") %>% 
+    dplyr::select(-Subject, -TimeIndex)
+
+
+    
 # Save dataframes as .csv files
 write.csv(communication.activity, "communication.activity.csv")
 write.csv(transformed.communication.activity, "transformed.communication.activity.csv")
 write.csv(energy.df, "energy.csv")
+write.csv(diet.df, "diet.csv")
