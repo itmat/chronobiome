@@ -324,7 +324,12 @@ diet.df <-
     diet %>% 
     dplyr::select(Subject, TimeIndex, TimeSubjectIndex, Data.type, Signal) %>% 
     dcast(formula = Subject + TimeIndex + TimeSubjectIndex ~ Data.type, value.var = "Signal") %>% 
-    dplyr::select(-Subject, -TimeIndex)
+    mutate(sqrt.KCalories = sqrt(Dietary.ConsumedFoodEnergyKcalsRFPM),
+           sqrt.Carbohydrates = sqrt(Dietary.Carbohydrateg),
+           sqrt.Protein = sqrt(Dietary.Proteing),
+           sqrt.Fat = sqrt(Dietary.TotalFatg),
+           sqrt.Sodium = sqrt(Dietary.Sodiummg)) %>% 
+    dplyr::select(TimeSubjectIndex, dplyr::starts_with("sqrt"))
 
 
     
