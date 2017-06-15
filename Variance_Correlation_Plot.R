@@ -79,7 +79,9 @@ GetR2 <- function(var1, var2, return_pvalue=FALSE) {
 
 
 PlotR2s <- function(chrono_df, title, Sequence,
-                    triangle_heatmap=FALSE, add_labels=FALSE, color_by_pvalue=FALSE, apply_bonferroni=FALSE) {
+                    triangle_heatmap=FALSE, add_labels=FALSE,
+                    color_by_pvalue=FALSE, apply_bonferroni=FALSE,
+                    showLegend=FALSE) {
   # Generates geom_tile plot of the % variance explained (R2) for each variable
   # by each other variable.
   # :param: chrono_df - Dataframe to plot, including all variables(activity,
@@ -132,6 +134,7 @@ PlotR2s <- function(chrono_df, title, Sequence,
   #                                   "SMS.Count x Call.Count" and "Call.Count
   #                                   x SMS.Count" are reciprocal comparisons)
   #                                   performed.
+  # :param: showLegend - boolean indicating whether or not to display legend.
     
   chrono_df["Subject"] <- NULL
   chrono_df["TimeSubjectIndex"] <- NULL            
@@ -205,7 +208,7 @@ PlotR2s <- function(chrono_df, title, Sequence,
                          "log.Axis2", "log.Axis1", "pulse.pressure", "arterial.pressure",
                          "diastolic.bp", "systolic.bp", "heart.rate",
                          "sqrt.Sodium", "sqrt.Fat", "sqrt.Protein", "sqrt.Carbohydrates",
-                         "sqrt.KCalories")
+                         "sqrt.KCalories.consumed")
   sequence.actcom <- c("Communication.amplitude", "Communication.period",
                        "Communication.phase", "circadian.signal.com",
                        "log.signal.com", "sqrt.Interaction.Diversity",
@@ -235,7 +238,7 @@ PlotR2s <- function(chrono_df, title, Sequence,
                         "log.Axis1", "pulse.pressure", "arterial.pressure",
                         "diastolic.bp", "systolic.bp", "heart.rate",
                         "sqrt.Sodium", "sqrt.Fat", "sqrt.Protein", "sqrt.Carbohydrates",
-                        "sqrt.KCalories")
+                        "sqrt.KCalories.consumed")
   sequence.4monthenergy <- c("Communication.amplitude", "Communication.period",
                              "Communication.phase", "circadian.signal.com",
                              "log.signal.com", "sqrt.Interaction.Diversity",
@@ -332,6 +335,10 @@ PlotR2s <- function(chrono_df, title, Sequence,
   if(add_labels) {
       plot <- plot + geom_text(aes(label=sprintf("%0.2f", round(variability.explained, digits = 2))),
                                size = 1.75)
+  }
+  
+  if(!showLegend) {
+      plot <- plot + theme(legend.position = "none")
   }
 
   return(plot)
@@ -1311,8 +1318,9 @@ Full.with.energy.reduced <- subset(Full.with.energy,
                                    select = -c(Days, Times.y,
                                                TimeSubjectIndex, Times.x, Subject))
 
-# Get a list of all 29-choose-2 combinations of two variables
-combos <-  gtools::combinations(n = 29, r = 2,
+# Get a list of all combinations of two variables
+combos <-  gtools::combinations(n = length(colnames(Full.with.energy.reduced)),
+                                r = 2,
                                 v = colnames(Full.with.energy.reduced),
                                 repeats.allowed = F)
 Full.with.energy.reduced["Subject"] <- subj
