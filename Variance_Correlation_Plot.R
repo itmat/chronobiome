@@ -203,7 +203,9 @@ PlotR2s <- function(chrono_df, title, Sequence,
                          "activity.phase", "circadian.signal.act", "log.signal.act",
                          "log.Steps", "log.activity.Vector.Magnitude", "log.Axis3",
                          "log.Axis2", "log.Axis1", "pulse.pressure", "arterial.pressure",
-                         "diastolic.bp", "systolic.bp", "heart.rate")
+                         "diastolic.bp", "systolic.bp", "heart.rate",
+                         "sqrt.Sodium", "sqrt.Fat", "sqrt.Protein", "sqrt.Carbohydrates",
+                         "sqrt.KCalories")
   sequence.actcom <- c("Communication.amplitude", "Communication.period",
                        "Communication.phase", "circadian.signal.com",
                        "log.signal.com", "sqrt.Interaction.Diversity",
@@ -231,7 +233,9 @@ PlotR2s <- function(chrono_df, title, Sequence,
                         "log.MET.rate", "log.kcals", "log.Steps",
                         "log.activity.Vector.Magnitude", "log.Axis3", "log.Axis2",
                         "log.Axis1", "pulse.pressure", "arterial.pressure",
-                        "diastolic.bp", "systolic.bp", "heart.rate")
+                        "diastolic.bp", "systolic.bp", "heart.rate",
+                        "sqrt.Sodium", "sqrt.Fat", "sqrt.Protein", "sqrt.Carbohydrates",
+                        "sqrt.KCalories")
   sequence.4monthenergy <- c("Communication.amplitude", "Communication.period",
                              "Communication.phase", "circadian.signal.com",
                              "log.signal.com", "sqrt.Interaction.Diversity",
@@ -518,11 +522,15 @@ transformed.communication.activity <-
   readr::read_csv("transformed.communication.activity.csv")
 transformed.communication.activity["X1"] <- NULL
 
+
 # Two 48 Hour visits containing measurements of blood pressure, heart rate
 BP_HR <- readr::read_csv("heartrate.bp.csv")
 BP_HR["X1"] <- NULL
+diet <- readr::read_csv("diet.csv")
+diet["X1"] <- NULL
 act.com.bp.hr.vars4months <- dplyr::full_join(BP_HR, transformed.communication.activity, 
-                                              by = "TimeSubjectIndex")
+                                              by = "TimeSubjectIndex") %>% 
+    dplyr::full_join(diet, by = "TimeSubjectIndex")
 bp.HR.com.act <- na.omit(act.com.bp.hr.vars4months)
 postscript("Variability.Act.Com.BP.eps")
 PlotR2s(bp.HR.com.act[,5:dim(bp.HR.com.act)[2]], 
