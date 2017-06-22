@@ -546,6 +546,12 @@ PlotR2s(bp.HR.com.act[,5:dim(bp.HR.com.act)[2]],
               "Communication, Biometric Data (Visits 1 and 2)"), "BP",
         triangle_heatmap = TRUE)
 dev.off()
+pdf("Variability.Act.Com.BP.pdf", height=8.5, width=10.5)
+PlotR2s(bp.HR.com.act[,5:dim(bp.HR.com.act)[2]], 
+        paste0("Variance Explained in Activity,", 
+               "Communication, Biometric Data (Visits 1 and 2)"), "BP",
+        triangle_heatmap = TRUE)
+dev.off()
 
 
 #Define spans for visits 1 & 2 in terms of the standardized time units
@@ -560,10 +566,20 @@ PlotR2s(Visit1_bp.HR.com.act[, 5:dim(Visit1_bp.HR.com.act)[2]],
         "Variance Explained in Activity, Communication, Biometric Data(Visit 1)",
         "BP", triangle_heatmap = TRUE)
 dev.off()
+pdf("Variability.Act.Com.BP.Visit1.pdf", height=8.5, width=10.5)
+PlotR2s(Visit1_bp.HR.com.act[, 5:dim(Visit1_bp.HR.com.act)[2]],
+        "Variance Explained in Activity, Communication, Biometric Data(Visit 1)",
+        "BP", triangle_heatmap = TRUE)
+dev.off()
 
 # 48 hour visit 2
 Visit2_bp.HR.com.act <- subset(bp.HR.com.act, Times %in% TimeList_window2)
 postscript("Variability.Act.Com.BP.Visit2.eps")
+PlotR2s(Visit2_bp.HR.com.act[, 5:dim(Visit2_bp.HR.com.act)[2]],
+        "Variance Explained in Activity, Communication, Biometric Data (Visit 2)", "BP",
+        triangle_heatmap = TRUE)
+dev.off()
+pdf("Variability.Act.Com.BP.Visit2.pdf", height=8.5, width=10.5)
 PlotR2s(Visit2_bp.HR.com.act[, 5:dim(Visit2_bp.HR.com.act)[2]],
         "Variance Explained in Activity, Communication, Biometric Data (Visit 2)", "BP",
         triangle_heatmap = TRUE)
@@ -587,6 +603,12 @@ postscript("Variance_Explained_WithEnergy.eps")
 PlotR2s(Full.with.energy[, 6:dim(Full.with.energy)[2] - 2],
         paste0("Variance Explained in Activity, Communication, Blood Pressure,",
               " and Energy Variables"),
+        "energy", triangle_heatmap = TRUE)
+dev.off()
+pdf("Variance_Explained_WithEnergy.pdf", height=8.5, width=10.5)
+PlotR2s(Full.with.energy[, 6:dim(Full.with.energy)[2] - 2],
+        paste0("Variance Explained in Activity, Communication, Blood Pressure,",
+               " and Energy Variables"),
         "energy", triangle_heatmap = TRUE)
 dev.off()
 
@@ -659,11 +681,19 @@ postscript("HCR001_Variance.4months_withEnergy.eps",
 PlotR2s(HCR001.4months, "Variance Explained in HCR001 (all 4 months)",
         "4monthenergy", triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR001_Variance.4months_withEnergy.pdf", height=8.5, width=10.5)
+PlotR2s(HCR001.4months, "Variance Explained in HCR001 (all 4 months)",
+        "4monthenergy", triangle_heatmap = TRUE)
+dev.off()
 
 # HCR003
 HCR003.4months <- subset(Energy.4months, Subject == "HCR003")
 postscript("HCR003_Variance.4months_withEnergy.eps",
            width = 480, height = 480)
+PlotR2s(HCR003.4months, "Variance Explained in HCR003 (all 4 months)",
+        "4monthenergy", triangle_heatmap = TRUE)
+dev.off()
+pdf("HCR003_Variance.4months_withEnergy.pdf", height=8.5, width=10.5)
 PlotR2s(HCR003.4months, "Variance Explained in HCR003 (all 4 months)",
         "4monthenergy", triangle_heatmap = TRUE)
 dev.off()
@@ -675,10 +705,18 @@ postscript("HCR004_Variance.4months_withEnergy.eps",
 PlotR2s(HCR004.4months, "Variance Explained in HCR004 (all 4 months)",
         "4monthenergy", triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR004_Variance.4months_withEnergy.pdf", height=8.5, width=10.5)
+PlotR2s(HCR004.4months, "Variance Explained in HCR004 (all 4 months)",
+        "4monthenergy", triangle_heatmap = TRUE)
+dev.off()
 
 # HCR006
 HCR006.4months <- subset(Energy.4months, Subject == "HCR006")
 postscript("HCR006_Variance.4months_withEnergy.eps", width = 480, height = 480)
+PlotR2s(HCR006.4months, "Variance Explained in HCR006 (all 4 months)",
+        "4monthenergy", triangle_heatmap = TRUE)
+dev.off()
+pdf("HCR006_Variance.4months_withEnergy.pdf", height=8.5, width=10.5)
 PlotR2s(HCR006.4months, "Variance Explained in HCR006 (all 4 months)",
         "4monthenergy", triangle_heatmap = TRUE)
 dev.off()
@@ -689,6 +727,10 @@ postscript("HCR008_Variance.4months_withEnergy.eps", width = 480, height = 480)
 PlotR2s(HCR008.4months, "Variance Explained in HCR008 (all 4 months)",
         "4monthenergy", triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR008_Variance.4months_withEnergy.pdf", height=8.5, width=10.5)
+PlotR2s(HCR008.4months, "Variance Explained in HCR008 (all 4 months)",
+        "4monthenergy", triangle_heatmap = TRUE)
+dev.off()
 
 # HCR009
 HCR009.4months <- subset(Energy.4months, Subject == "HCR009")
@@ -696,9 +738,18 @@ postscript("HCR009_Variance.4months_withEnergy.eps", width = 480, height = 480)
 PlotR2s(HCR009.4months, "Variance Explained in HCR009 (all 4 months)",
         "4monthenergy", triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR009_Variance.4months_withEnergy.pdf", height=8.5, width=10.5)
+PlotR2s(HCR009.4months, "Variance Explained in HCR009 (all 4 months)",
+        "4monthenergy", triangle_heatmap = TRUE)
+dev.off()
 
 postscript("Variability.Activity.Communication_WithEnergy.eps",
            width = 480, height = 480)
+PlotR2s(Energy.4months,
+        "Variance Explained in Activity and Communication Data (4 months)",
+        "4monthenergy", triangle_heatmap = TRUE)
+dev.off()
+pdf("Variability.Activity.Communication_WithEnergy.pdf", height=8.5, width=10.5)
 PlotR2s(Energy.4months,
         "Variance Explained in Activity and Communication Data (4 months)",
         "4monthenergy", triangle_heatmap = TRUE)
@@ -713,6 +764,10 @@ postscript("HCR001_Variance_BothVisits.eps",  width = 480, height = 480)
 PlotR2s(HCR001.set[, 6:dim(HCR001.set)[2] - 2], "Variance Explained in HCR001",
         "energy", triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR001_Variance_BothVisits.pdf", height=8.5, width=10.5)
+PlotR2s(HCR001.set[, 6:dim(HCR001.set)[2] - 2], "Variance Explained in HCR001",
+        "energy", triangle_heatmap = TRUE)
+dev.off()
 
 # HCR003
 HCR003.set <- subset(Full.with.energy, Subject == "HCR003")
@@ -720,10 +775,18 @@ postscript("HCR003_Variance_BothVisits.eps",  width = 480, height = 480)
 PlotR2s(HCR003.set[, 6:dim(HCR003.set)[2] - 2], "Variance Explained in HCR003",
         "energy", triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR003_Variance_BothVisits.pdf", height=8.5, width=10.5)
+PlotR2s(HCR003.set[, 6:dim(HCR003.set)[2] - 2], "Variance Explained in HCR003",
+        "energy", triangle_heatmap = TRUE)
+dev.off()
 
 # HCR004
 HCR004.set <- subset(Full.with.energy, Subject == "HCR004")
 postscript("HCR004_Variance_BothVisits.eps",  width = 480, height = 480)
+PlotR2s(HCR004.set[, 6:dim(HCR004.set)[2] - 2], "Variance Explained in HCR004",
+        "energy", triangle_heatmap = TRUE)
+dev.off()
+pdf("HCR004_Variance_BothVisits.pdf", height=8.5, width=10.5)
 PlotR2s(HCR004.set[, 6:dim(HCR004.set)[2] - 2], "Variance Explained in HCR004",
         "energy", triangle_heatmap = TRUE)
 dev.off()
@@ -735,10 +798,18 @@ postscript("HCR006_Variance_BothVisits.eps",  width = 480, height = 480)
 PlotR2s(HCR006.set[, 6:dim(HCR006.set)[2] - 2], "Variance Explained in HCR006",
         "energy", triangle_heatmap = TRUE)
 dev.off()
-  
+pdf("HCR006_Variance_BothVisits.pdf", height=8.5, width=10.5)
+PlotR2s(HCR006.set[, 6:dim(HCR006.set)[2] - 2], "Variance Explained in HCR006",
+        "energy", triangle_heatmap = TRUE)
+dev.off()
+
 # HCR008
 HCR008.set <- subset(Full.with.energy, Subject == "HCR008")
 postscript("HCR008_Variance_BothVisits.eps",  width = 480, height = 480)
+PlotR2s(HCR008.set[, 6:dim(HCR008.set)[2] - 2], "Variance Explained in HCR008",
+        "energy", triangle_heatmap = TRUE)
+dev.off()
+pdf("HCR008_Variance_BothVisits.pdf", height=8.5, width=10.5)
 PlotR2s(HCR008.set[, 6:dim(HCR008.set)[2] - 2], "Variance Explained in HCR008",
         "energy", triangle_heatmap = TRUE)
 dev.off()
@@ -746,6 +817,10 @@ dev.off()
 # HCR009
 HCR009.set <- subset(Full.with.energy, Subject == "HCR009")
 postscript("HCR009_Variance_BothVisits.eps",  width = 480, height = 480)
+PlotR2s(HCR009.set[, 6:dim(HCR009.set)[2] - 2], "Variance Explained in HCR009",
+        "energy", triangle_heatmap = TRUE)
+dev.off()
+pdf("HCR009_Variance_BothVisits.pdf", height=8.5, width=10.5)
 PlotR2s(HCR009.set[, 6:dim(HCR009.set)[2] - 2], "Variance Explained in HCR009",
         "energy", triangle_heatmap = TRUE)
 dev.off()
@@ -760,7 +835,17 @@ PlotR2s(HCR001.set1[, 6:dim(HCR001.set1)[2] - 2],
         "Variance Explained in HCR001 (visit 1)", "energy",
         triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR001_Variance_visit1.pdf", height=8.5, width=10.5)
+PlotR2s(HCR001.set1[, 6:dim(HCR001.set1)[2] - 2],
+        "Variance Explained in HCR001 (visit 1)", "energy",
+        triangle_heatmap = TRUE)
+dev.off()
 postscript("HCR001_Variance_visit1.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR001.set1[, 6:dim(HCR001.set1)[2] - 2],
+        "Variance Explained in HCR001 (visit 1)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
+pdf("HCR001_Variance_visit1.with_labels.pdf", height=8.5, width=10.5)
 PlotR2s(HCR001.set1[, 6:dim(HCR001.set1)[2] - 2],
         "Variance Explained in HCR001 (visit 1)", "energy",
         triangle_heatmap = TRUE, add_labels = TRUE)
@@ -774,7 +859,17 @@ PlotR2s(HCR003.set1[, 6:dim(HCR003.set1)[2] - 2],
         "Variance Explained in HCR003 (visit 1)", "energy",
         triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR003_Variance_visit1.pdf", height=8.5, width=10.5)
+PlotR2s(HCR003.set1[, 6:dim(HCR003.set1)[2] - 2],
+        "Variance Explained in HCR003 (visit 1)", "energy",
+        triangle_heatmap = TRUE)
+dev.off()
 postscript("HCR003_Variance_visit1.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR003.set1[, 6:dim(HCR003.set1)[2] - 2],
+        "Variance Explained in HCR003 (visit 1)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
+pdf("HCR003_Variance_visit1.with_labels.pdf", height=8.5, width=10.5)
 PlotR2s(HCR003.set1[, 6:dim(HCR003.set1)[2] - 2],
         "Variance Explained in HCR003 (visit 1)", "energy",
         triangle_heatmap = TRUE, add_labels = TRUE)
@@ -787,7 +882,17 @@ PlotR2s(HCR004.set1[, 6:dim(HCR004.set1)[2] - 2],
         "Variance Explained in HCR004 (visit 1)", "energy",
         triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR004_Variance_visit1.pdf", height=8.5, width=10.5)
+PlotR2s(HCR004.set1[, 6:dim(HCR004.set1)[2] - 2],
+        "Variance Explained in HCR004 (visit 1)", "energy",
+        triangle_heatmap = TRUE)
+dev.off()
 postscript("HCR004_Variance_visit1.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR004.set1[, 6:dim(HCR004.set1)[2] - 2],
+        "Variance Explained in HCR004 (visit 1)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
+pdf("HCR004_Variance_visit1.with_labels.pdf", height=8.5, width=10.5)
 PlotR2s(HCR004.set1[, 6:dim(HCR004.set1)[2] - 2],
         "Variance Explained in HCR004 (visit 1)", "energy",
         triangle_heatmap = TRUE, add_labels = TRUE)
@@ -800,7 +905,17 @@ PlotR2s(HCR006.set1[, 6:dim(HCR006.set1)[2] - 2],
         "Variance Explained in HCR006 (visit 1)", "energy",
         triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR006_Variance_visit1.pdf", height=8.5, width=10.5)
+PlotR2s(HCR006.set1[, 6:dim(HCR006.set1)[2] - 2],
+        "Variance Explained in HCR006 (visit 1)", "energy",
+        triangle_heatmap = TRUE)
+dev.off()
 postscript("HCR006_Variance_visit1.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR006.set1[, 6:dim(HCR006.set1)[2] - 2],
+        "Variance Explained in HCR006 (visit 1)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
+pdf("HCR006_Variance_visit1.with_labels.pdf", height=8.5, width=10.5)
 PlotR2s(HCR006.set1[, 6:dim(HCR006.set1)[2] - 2],
         "Variance Explained in HCR006 (visit 1)", "energy",
         triangle_heatmap = TRUE, add_labels = TRUE)
@@ -813,7 +928,17 @@ PlotR2s(HCR008.set1[, 6:dim(HCR008.set1)[2] - 2],
         "Variance Explained in HCR008 (visit 1)", "energy",
         triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR008_Variance_visit1.pdf", height=8.5, width=10.5)
+PlotR2s(HCR008.set1[, 6:dim(HCR008.set1)[2] - 2],
+        "Variance Explained in HCR008 (visit 1)", "energy",
+        triangle_heatmap = TRUE)
+dev.off()
 postscript("HCR008_Variance_visit1.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR008.set1[, 6:dim(HCR008.set1)[2] - 2],
+        "Variance Explained in HCR008 (visit 1)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
+pdf("HCR008_Variance_visit1.with_labels.pdf", height=8.5, width=10.5)
 PlotR2s(HCR008.set1[, 6:dim(HCR008.set1)[2] - 2],
         "Variance Explained in HCR008 (visit 1)", "energy",
         triangle_heatmap = TRUE, add_labels = TRUE)
@@ -826,7 +951,17 @@ PlotR2s(HCR009.set1[, 6:dim(HCR009.set1)[2] - 2],
         "Variance Explained in HCR009 (visit 1)", "energy",
         triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR009_Variance_visit1.pdf", height=8.5, width=10.5)
+PlotR2s(HCR009.set1[, 6:dim(HCR009.set1)[2] - 2],
+        "Variance Explained in HCR009 (visit 1)", "energy",
+        triangle_heatmap = TRUE)
+dev.off()
 postscript("HCR009_Variance_visit1.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR009.set1[, 6:dim(HCR009.set1)[2] - 2],
+        "Variance Explained in HCR009 (visit 1)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
+pdf("HCR009_Variance_visit1.with_labels.pdf", height=8.5, width=10.5)
 PlotR2s(HCR009.set1[, 6:dim(HCR009.set1)[2] - 2],
         "Variance Explained in HCR009 (visit 1)", "energy",
         triangle_heatmap = TRUE, add_labels = TRUE)
@@ -841,7 +976,17 @@ PlotR2s(HCR001.set2[, 6:dim(HCR001.set2)[2] - 2],
         "Variance Explained in HCR001 (visit 2)", "energy",
         triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR001_Variance_visit2.pdf", height=8.5, width=10.5)
+PlotR2s(HCR001.set2[, 6:dim(HCR001.set2)[2] - 2],
+        "Variance Explained in HCR001 (visit 2)", "energy",
+        triangle_heatmap = TRUE)
+dev.off()
 postscript("HCR001_Variance_visit2.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR001.set2[, 6:dim(HCR001.set2)[2] - 2],
+        "Variance Explained in HCR001 (visit 2)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
+pdf("HCR001_Variance_visit2.with_labels.pdf", height=8.5, width=10.5)
 PlotR2s(HCR001.set2[, 6:dim(HCR001.set2)[2] - 2],
         "Variance Explained in HCR001 (visit 2)", "energy",
         triangle_heatmap = TRUE, add_labels = TRUE)
@@ -854,7 +999,17 @@ PlotR2s(HCR003.set2[, 6:dim(HCR003.set2)[2] - 2],
         "Variance Explained in HCR003 (visit 2)", "energy",
         triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR003_Variance_visit2.pdf", height=8.5, width=10.5)
+PlotR2s(HCR003.set2[, 6:dim(HCR003.set2)[2] - 2],
+        "Variance Explained in HCR003 (visit 2)", "energy",
+        triangle_heatmap = TRUE)
+dev.off()
 postscript("HCR003_Variance_visit2.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR003.set2[, 6:dim(HCR003.set2)[2] - 2],
+        "Variance Explained in HCR003 (visit 2)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
+pdf("HCR003_Variance_visit2.with_labels.pdf", height=8.5, width=10.5)
 PlotR2s(HCR003.set2[, 6:dim(HCR003.set2)[2] - 2],
         "Variance Explained in HCR003 (visit 2)", "energy",
         triangle_heatmap = TRUE, add_labels = TRUE)
@@ -867,7 +1022,17 @@ PlotR2s(HCR004.set2[, 6:dim(HCR004.set2)[2] - 2],
         "Variance Explained in HCR004 (visit 2)", "energy",
         triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR004_Variance_visit2.pdf", height=8.5, width=10.5)
+PlotR2s(HCR004.set2[, 6:dim(HCR004.set2)[2] - 2],
+        "Variance Explained in HCR004 (visit 2)", "energy",
+        triangle_heatmap = TRUE)
+dev.off()
 postscript("HCR004_Variance_visit2.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR004.set2[, 6:dim(HCR004.set2)[2] - 2],
+        "Variance Explained in HCR004 (visit 2)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
+pdf("HCR004_Variance_visit2.with_labels.pdf", height=8.5, width=10.5)
 PlotR2s(HCR004.set2[, 6:dim(HCR004.set2)[2] - 2],
         "Variance Explained in HCR004 (visit 2)", "energy",
         triangle_heatmap = TRUE, add_labels = TRUE)
@@ -880,7 +1045,17 @@ PlotR2s(HCR006.set2[, 6:dim(HCR006.set2)[2] - 2],
         "Variance Explained in HCR006 (visit 2)", "energy",
         triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR006_Variance_visit2.pdf", height=8.5, width=10.5)
+PlotR2s(HCR006.set2[, 6:dim(HCR006.set2)[2] - 2],
+        "Variance Explained in HCR006 (visit 2)", "energy",
+        triangle_heatmap = TRUE)
+dev.off()
 postscript("HCR006_Variance_visit2.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR006.set2[, 6:dim(HCR006.set2)[2] - 2],
+        "Variance Explained in HCR006 (visit 2)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
+pdf("HCR006_Variance_visit2.with_labels.pdf", height=8.5, width=10.5)
 PlotR2s(HCR006.set2[, 6:dim(HCR006.set2)[2] - 2],
         "Variance Explained in HCR006 (visit 2)", "energy",
         triangle_heatmap = TRUE, add_labels = TRUE)
@@ -898,7 +1073,17 @@ PlotR2s(HCR009.set2[, 6:dim(HCR009.set2)[2] - 2],
         "Variance Explained in HCR009 (visit 2)", "energy",
         triangle_heatmap = TRUE)
 dev.off()
+pdf("HCR009_Variance_visit2.pdf", height=8.5, width=10.5)
+PlotR2s(HCR009.set2[, 6:dim(HCR009.set2)[2] - 2],
+        "Variance Explained in HCR009 (visit 2)", "energy",
+        triangle_heatmap = TRUE)
+dev.off()
 postscript("HCR009_Variance_visit2.with_labels.eps",  width = 480, height = 480)
+PlotR2s(HCR009.set2[, 6:dim(HCR009.set2)[2] - 2],
+        "Variance Explained in HCR009 (visit 2)", "energy",
+        triangle_heatmap = TRUE, add_labels = TRUE)
+dev.off()
+pdf("HCR009_Variance_visit2.with_labels.pdf", height=8.5, width=10.5)
 PlotR2s(HCR009.set2[, 6:dim(HCR009.set2)[2] - 2],
         "Variance Explained in HCR009 (visit 2)", "energy",
         triangle_heatmap = TRUE, add_labels = TRUE)
@@ -916,9 +1101,20 @@ PlotR2s(bp.HR.com.act[,5:dim(bp.HR.com.act)[2]],
                "Communication, Biometric Data (Visits 1 and 2)"), "BP",
         color_by_pvalue = TRUE, apply_bonferroni = TRUE)
 dev.off()
+pdf("LM_pvalues.Act.Com.BP.pdf", height=8.5, width=10.5)
+PlotR2s(bp.HR.com.act[,5:dim(bp.HR.com.act)[2]], 
+        paste0("Model fit p-values for Activity,", 
+               "Communication, Biometric Data (Visits 1 and 2)"), "BP",
+        color_by_pvalue = TRUE, apply_bonferroni = TRUE)
+dev.off()
 
 # 48 hour visit 1
 postscript("LM_pvalues.Act.Com.BP.Visit1.Feb.eps")
+PlotR2s(Visit1_bp.HR.com.act[, 5:dim(Visit1_bp.HR.com.act)[2]],
+        "Model fit p-values for Activity, Communication, Biometric Data(Visit 1)",
+        "BP", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
+dev.off()
+pdf("LM_pvalues.Act.Com.BP.Visit1.Feb.pdf", height=8.5, width=10.5)
 PlotR2s(Visit1_bp.HR.com.act[, 5:dim(Visit1_bp.HR.com.act)[2]],
         "Model fit p-values for Activity, Communication, Biometric Data(Visit 1)",
         "BP", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
@@ -930,9 +1126,20 @@ PlotR2s(Visit2_bp.HR.com.act[, 5:dim(Visit2_bp.HR.com.act)[2]],
         "Model fit p-values for Activity, Communication, Biometric Data (Visit 2)",
         "BP", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
 dev.off()
+pdf("LM_pvalues.Act.Com.BP.Visit2.Feb.pdf", height=8.5, width=10.5)
+PlotR2s(Visit2_bp.HR.com.act[, 5:dim(Visit2_bp.HR.com.act)[2]],
+        "Model fit p-values for Activity, Communication, Biometric Data (Visit 2)",
+        "BP", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
+dev.off()
 
 # Two 48 Hour visits containing measurements of blood pressure, heart rate, and energy expenditure
 postscript("LM_pvalues_WithEnergy.eps")
+PlotR2s(Full.with.energy[, 6:dim(Full.with.energy)[2] - 2],
+        paste0("Model fit p-values for Activity, Communication, Blood Pressure,",
+               " and Energy Variables"),
+        "energy", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
+dev.off()
+pdf("LM_pvalues_WithEnergy.pdf", height=8.5, width=10.5)
 PlotR2s(Full.with.energy[, 6:dim(Full.with.energy)[2] - 2],
         paste0("Model fit p-values for Activity, Communication, Blood Pressure,",
                " and Energy Variables"),
@@ -949,6 +1156,11 @@ dev.off()
 # All four months (with energy)
 postscript("LM_pvalues.Activity.Communication_WithEnergy.eps",
            width = 480, height = 480)
+PlotR2s(Energy.4months,
+        "Model fit p-values for Activity and Communication Data (4 months)",
+        "4monthenergy", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
+dev.off()
+pdf("LM_pvalues.Activity.Communication_WithEnergy.pdf", height=8.5, width=10.5)
 PlotR2s(Energy.4months,
         "Model fit p-values for Activity and Communication Data (4 months)",
         "4monthenergy", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
@@ -1021,6 +1233,12 @@ all_subjects.pvalue_table.4months_w_E = data.frame()
 for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
     subject.4months <- subset(Energy.4months, Subject == subject)
     postscript(paste0(subject, "_LM_pvalues.4months_withEnergy.eps"),  width = 480, height = 480)
+    figure_plot =
+        PlotR2s(subject.4months, paste0("Model fit p-values for ", subject, " (all 4 months)"),
+                "4monthenergy", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
+    print(figure_plot)
+    dev.off()
+    pdf(paste0(subject, "_LM_pvalues.4months_withEnergy.pdf"), height=8.5, width=10.5)
     figure_plot = 
         PlotR2s(subject.4months, paste0("Model fit p-values for ", subject, " (all 4 months)"),
                 "4monthenergy", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
@@ -1077,6 +1295,13 @@ all_subjects.pvalue_table.bothVisits = data.frame()
 for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
     subject.set <- subset(Full.with.energy, Subject == subject)
     postscript(paste0(subject, "_LM_pvalues_BothVisits.eps"),  width = 480, height = 480)
+    figure_plot =
+        PlotR2s(subject.set[, 6:dim(subject.set)[2] - 2],
+                paste0("Model fit p-values for ", subject),
+                "energy", color_by_pvalue = TRUE, apply_bonferroni = TRUE)
+    print(figure_plot)
+    dev.off()
+    pdf(paste0(subject, "_LM_pvalues_BothVisits.pdf"), height=8.5, width=10.5)
     figure_plot = 
         PlotR2s(subject.set[, 6:dim(subject.set)[2] - 2],
                 paste0("Model fit p-values for ", subject),
@@ -1141,6 +1366,13 @@ for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
     subject.set <- subset(subset(Full.with.energy, Subject == subject),
                           Days <= subset(subject_to_session.by_Days, Subject == subject)$Visit1)
     postscript(paste0(subject, "_LM_pvalues_visit1.eps"),  width = 480, height = 480)
+    figure_plot =
+        PlotR2s(subject.set[, 6:dim(subject.set)[2] - 2],
+                paste0("Model fit p-values for ", subject, " (visit 1)"), "energy",
+                color_by_pvalue = TRUE, apply_bonferroni = TRUE)
+    print(figure_plot)
+    dev.off()
+    pdf(paste0(subject, "_LM_pvalues_visit1.pdf"), height=8.5, width=10.5)
     figure_plot = 
         PlotR2s(subject.set[, 6:dim(subject.set)[2] - 2],
                 paste0("Model fit p-values for ", subject, " (visit 1)"), "energy",
@@ -1200,6 +1432,13 @@ for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR009")) {
     subject.set <- subset(subset(Full.with.energy, Subject == subject),
                           Days >= subset(subject_to_session.by_Days, Subject == subject)$Visit2)
     postscript(paste0(subject, "_LM_pvalues_visit2.eps"),  width = 480, height = 480)
+    figure_plot = 
+        PlotR2s(subject.set[, 6:dim(subject.set)[2] - 2],
+                paste0("Model fit p-values for ", subject, " (visit 2)"), "energy",
+                color_by_pvalue = TRUE, apply_bonferroni = TRUE)
+    print(figure_plot)
+    dev.off()
+    pdf(paste0(subject, "_LM_pvalues_visit2.pdf"), height=8.5, width=10.5)
     figure_plot = 
         PlotR2s(subject.set[, 6:dim(subject.set)[2] - 2],
                 paste0("Model fit p-values for ", subject, " (visit 2)"), "energy",
