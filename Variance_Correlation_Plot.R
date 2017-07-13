@@ -77,6 +77,72 @@ GetR2 <- function(var1, var2, return_pvalue=FALSE) {
   return(c(Var1name, Var2name, ret_value))
 }
 
+GetR2AndPvalue <- function(var1, var2) {
+    # Generates a simple linear regression model of var1~var2, and returns
+    # R-squared for that model to represent proportion of V1 explained by V2.
+    # Also returns the associated p-value.
+    # :param: var1 - Variable to 'be explained' by var2
+    # :param: var2 - Variable to 'explain' var1
+    Var1name <- colnames(var1)[1]
+    Var2name <-  colnames(var2)[1]
+    model <- lm(as.numeric(var1) ~ as.numeric(var2))
+    
+    ret_r_squared = summary(model)$r.squared
+    
+    fstats <- summary(model)$fstatistic
+    ret_p_value <- NA
+    
+    #If an f-test was performed successfully
+    if(!is.null(fstats)) {
+        pvalue <- pf(fstats[1],fstats[2],fstats[3],lower.tail=F)
+        attributes(pvalue) <- NULL
+        ret_p_value <- pvalue
+    }
+    
+    return(c(Var1name, Var2name, ret_r_squared, ret_p_value))
+}
+
+
+GetR2sAndPvalueTable <- function(chrono_df, apply_bonferroni=FALSE) {
+    # Generates table of the % variance explained (R2) for each variable
+    # by each other variable. Also includes associated p-values.
+    # :param: chrono_df - Dataframe to plot, including all variables(activity,
+    #                     communication, and in certain time frames,
+    #                     blood pressure) to be compared in this table.
+    #                     note: each variable in the dataframe will be compared
+    #                     to each other variable in the dataframe (and itself);
+    #                     because these will be compared using R-squared values
+    #                     yielded from simple linear regression models, they
+    #                     must be numeric
+    # :param: apply_bonferroni - boolean indicating whether or not to apply
+    #                            a Bonferroni correction to the p-values. If
+    #                            true, return table will contain an extra column
+    #                            with the Bonferroni-corrected p-values.
+    
+    chrono_df["Subject"] <- NULL
+    chrono_df["TimeSubjectIndex"] <- NULL            
+    r2Matrix <- c()
+    for (a in colnames(chrono_df)) {
+        for (b in colnames(chrono_df)) {
+            r2Matrix <-
+                rbind(r2Matrix,
+                      GetR2AndPvalue(as.matrix(chrono_df[a]),
+                                     as.matrix(chrono_df[b])
+                      ))
+        }
+    }
+    plot.matrix <- data.frame(r2Matrix)
+    colnames(plot.matrix) <- c("factor.1", "factor.2", "variability.explained", "p.value")
+    plot.matrix$variability.explained <- as.numeric(as.character(plot.matrix$variability.explained))
+    plot.matrix$p.value <- as.numeric(as.character(plot.matrix$p.value))
+    
+    if(apply_bonferroni) {
+        plot.matrix$bonferroni_p.value <- p.adjust(plot.matrix$p.value, method = "bonferroni")
+    }
+    
+    return(as.data.frame(plot.matrix))
+}
+
 
 PlotR2s <- function(chrono_df, title, Sequence,
                     triangle_heatmap=FALSE, add_labels=FALSE,
@@ -597,6 +663,7 @@ Energy.4months <- na.omit(Energy.4months)
 Full.with.energy <- dplyr::full_join(bp.HR.com.act, energy,
                                      by = "TimeSubjectIndex")
 Full.with.energy <- na.omit(Full.with.energy)
+
 
 postscript("Variance_Explained_WithEnergy.eps")
 # Plot R^2s excluding Times variable
@@ -1542,6 +1609,80 @@ PlotDendro(merged_data_for_clustering,
 dev.off()
 
 
+
+
+# Tables of R^2 and LM-fit p-values
+###################################
+
+# Two 48 Hour visits containing measurements of blood pressure, heart rate, and energy expenditure
+write.table(GetR2sAndPvalueTable(Full.with.energy[, 6:dim(Full.with.energy)[2] - 2], apply_bonferroni = TRUE),
+            "Rsquared_and_pvalue_table.BothVisits.txt",
+            sep="\t", quote = FALSE, row.names = FALSE)
+
+# 48 Hour visit 1 containing measurements of blood pressure, heart rate, and energy expenditure
+Visit_1.Full.with.energy <- subset(Full.with.energy, Times.x %in% TimeList_window1)
+write.table(GetR2sAndPvalueTable(Visit_1.Full.with.energy[, 6:dim(Visit_1.Full.with.energy)[2] - 2], apply_bonferroni = TRUE),
+            "Rsquared_and_pvalue_table.Visit1.txt",
+            sep="\t", quote = FALSE, row.names = FALSE)
+
+# 48 Hour visit 2 containing measurements of blood pressure, heart rate, and energy expenditure
+Visit_2.Full.with.energy <- subset(Full.with.energy, Times.x %in% TimeList_window2)
+write.table(GetR2sAndPvalueTable(Visit_2.Full.with.energy[, 6:dim(Visit_2.Full.with.energy)[2] - 2], apply_bonferroni = TRUE),
+            "Rsquared_and_pvalue_table.Visit2.txt",
+            sep="\t", quote = FALSE, row.names = FALSE)
+
+# All four months (with energy)
+write.table(GetR2sAndPvalueTable(Energy.4months, apply_bonferroni = TRUE),
+            "Rsquared_and_pvalue_table.4months.txt",
+            sep="\t", quote = FALSE, row.names = FALSE)
+
+
+# All four months by subject (with energy)
+for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
+    subject.4months <- subset(Energy.4months, Subject == subject)
+    
+    write.table(GetR2sAndPvalueTable(subject.4months, apply_bonferroni = TRUE),
+                paste0("Rsquared_and_pvalue_table.4months.", subject, ".txt"),
+                sep="\t", quote = FALSE, row.names = FALSE)
+}
+
+# Both Visits by Subject all variables 
+for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
+    subject.set <- subset(Full.with.energy, Subject == subject)
+    
+    write.table(GetR2sAndPvalueTable(subject.set[, 6:dim(subject.set)[2] - 2], apply_bonferroni = TRUE),
+                paste0("Rsquared_and_pvalue_table.BothVisits.", subject, ".txt"),
+                sep="\t", quote = FALSE, row.names = FALSE)
+}
+
+
+#Map Subject ID to Days cutoffs for Visit 1 and Visit 2
+subject_to_session.by_Days =
+    data.frame(Subject = c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009"),
+               Visit1 = c(43, 43, 45, 44, 45, 51),
+               Visit2 = c(55, 55, 55, 57, 55, 62))
+
+# Visit 1 by Subject all variables
+for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR008","HCR009")) {
+    subject.set <- subset(subset(Full.with.energy, Subject == subject),
+                          Days <= subset(subject_to_session.by_Days, Subject == subject)$Visit1)
+    
+    write.table(GetR2sAndPvalueTable(subject.set[, 6:dim(subject.set)[2] - 2], apply_bonferroni = TRUE),
+                paste0("Rsquared_and_pvalue_table.Visit1.", subject, ".txt"),
+                sep="\t", quote = FALSE, row.names = FALSE)
+}
+
+
+# Visit 2 by Subject all variables
+#Note: Skip HCR008 because it's missing a lot of data from this visit
+for(subject in c("HCR001","HCR003","HCR004","HCR006","HCR009")) {
+    subject.set <- subset(subset(Full.with.energy, Subject == subject),
+                          Days >= subset(subject_to_session.by_Days, Subject == subject)$Visit2)
+    
+    write.table(GetR2sAndPvalueTable(subject.set[, 6:dim(subject.set)[2] - 2], apply_bonferroni = TRUE),
+                paste0("Rsquared_and_pvalue_table.Visit2.", subject, ".txt"),
+                sep="\t", quote = FALSE, row.names = FALSE)
+}
 
 
 
